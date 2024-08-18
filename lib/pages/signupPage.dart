@@ -6,9 +6,8 @@ class SignupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            const Color(0xFF312E81), // Matches the background color
-        elevation: 0, // Remove the shadow
+        backgroundColor: const Color(0xFF312E81),
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -16,7 +15,7 @@ class SignupPage extends StatelessWidget {
           },
         ),
       ),
-      backgroundColor: const Color(0xFF312E81), // Background color
+      backgroundColor: const Color(0xFF312E81),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -51,7 +50,7 @@ class SignupPage extends StatelessWidget {
               // Form Fields Container
               Center(
                 child: Container(
-                  width: 350, // Set the width of the fields container
+                  width: 350,
                   child: Column(
                     children: [
                       // First Name Field
@@ -60,9 +59,22 @@ class SignupPage extends StatelessWidget {
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'First Name',
+                          prefixIcon: Icon(Icons.person, color: Colors.grey),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
                           ),
                         ),
                         style: const TextStyle(color: Colors.black),
@@ -75,9 +87,22 @@ class SignupPage extends StatelessWidget {
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Middle Name',
+                          prefixIcon: Icon(Icons.person, color: Colors.grey),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
                           ),
                         ),
                         style: const TextStyle(color: Colors.black),
@@ -90,9 +115,22 @@ class SignupPage extends StatelessWidget {
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Last Name',
+                          prefixIcon: Icon(Icons.person, color: Colors.grey),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
                           ),
                         ),
                         style: const TextStyle(color: Colors.black),
@@ -105,9 +143,22 @@ class SignupPage extends StatelessWidget {
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Email',
+                          prefixIcon: Icon(Icons.email, color: Colors.grey),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
                           ),
                         ),
                         style: const TextStyle(color: Colors.black),
@@ -121,9 +172,22 @@ class SignupPage extends StatelessWidget {
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Password',
+                          prefixIcon: Icon(Icons.lock, color: Colors.grey),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                            borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
                           ),
                         ),
                         style: const TextStyle(color: Colors.black),
@@ -137,7 +201,7 @@ class SignupPage extends StatelessWidget {
               // Signup Button Container
               Center(
                 child: Container(
-                  width: 250, // Set the width of the button container
+                  width: 250,
                   child: ElevatedButton(
                     onPressed: () {
                       // Implement signup functionality
