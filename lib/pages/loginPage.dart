@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './signupPage.dart';
+import './homePage.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -138,6 +139,10 @@ class LoginPage extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     // Implement login functionality
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurpleAccent,
