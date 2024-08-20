@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './signupPage.dart';
 import './homePage.dart';
+import './forgotPassword.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -122,7 +123,10 @@ class LoginPage extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {
-                      // Implement forgot password functionality
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ForgotPasswordPage()));
                     },
                     child: const Text(
                       'Forgot Password?',
