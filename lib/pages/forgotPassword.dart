@@ -17,50 +17,71 @@ class ForgotPasswordPage extends StatelessWidget {
       ),
       body: Center(
         child: Container(
-          color: Color(0xFF312E81), // Set background color
+          color: Color(0xFF312E81),
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
-              Text(
-                'Please enter your email address to reset your password.',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  labelText: 'Email Address',
-                  labelStyle: TextStyle(color: Color(0xFF312E81)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  errorText: validateEmail(emailController.text)
-                      ? null
-                      : 'Please enter a valid email address',
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'RESET PASSWORD',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  textAlign: TextAlign.center,
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Color(0xFF312E81),
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  child: TextField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Color(0xFF4C4C8A),
+                      labelText: 'Email Address',
+                      labelStyle: TextStyle(color: Colors.white70),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      errorText: validateEmail(emailController.text)
+                          ? null
+                          : 'Please enter a valid email address',
+                      errorStyle: TextStyle(
+                          color: Colors.white70), // Non-red error text
+                    ),
                   ),
                 ),
-                onPressed: () {
-                  // Add your forgot password logic here
-                },
-                child: Center(
-                  child: Text(
-                    'Reset Password',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: 200,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF4C4C8A),
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      // Add your forgot password logic here
+                    },
+                    child: Center(
+                      child: Text(
+                        'Reset Password',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ),
               ),
