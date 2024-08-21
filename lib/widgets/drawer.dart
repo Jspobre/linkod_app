@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:linkod_app/pages/homePage.dart';
 import '../pages/profilePage.dart';
 import '../pages/eventPage.dart';
+import '../pages/requestReportPage.dart';
+import '../pages/settingsPage.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -23,6 +26,16 @@ class AppDrawer extends StatelessWidget {
                 SizedBox(height: 10),
               ],
             ),
+          ),
+          ListTile(
+            leading: Icon(Icons.home, color: Colors.black, size: 30.0),
+            title: Text('Home'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HomePage()),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.person, color: Colors.black, size: 30.0),
@@ -48,14 +61,20 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.report, color: Colors.black, size: 30.0),
             title: Text('Report/Request Status'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RequestPage()),
+              );
             },
           ),
           ListTile(
             leading: Icon(Icons.settings, color: Colors.black, size: 30.0),
             title: Text('Settings'),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
             },
           ),
           ListTile(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import './signupPage.dart';
 import './homePage.dart';
 import './forgotPassword.dart';
@@ -37,13 +38,15 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Login Text
-              const Center(
+              Center(
                 child: Text(
                   'Login',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                  style: GoogleFonts.roboto(
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -59,7 +62,7 @@ class LoginPage extends StatelessWidget {
                     filled: true,
                     fillColor: Colors.white,
                     hintText: 'Email',
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: GoogleFonts.roboto(color: Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                       borderSide: BorderSide.none,
@@ -77,7 +80,7 @@ class LoginPage extends StatelessWidget {
                           BorderSide(color: Colors.grey.shade300, width: 1.0),
                     ),
                   ),
-                  style: const TextStyle(color: Colors.black),
+                  style: GoogleFonts.roboto(color: Colors.black),
                 ),
               ),
               const SizedBox(height: 20),
@@ -93,7 +96,7 @@ class LoginPage extends StatelessWidget {
                     filled: true,
                     fillColor: Colors.white,
                     hintText: 'Password',
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: GoogleFonts.roboto(color: Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                       borderSide: BorderSide.none,
@@ -111,7 +114,7 @@ class LoginPage extends StatelessWidget {
                           BorderSide(color: Colors.grey.shade300, width: 1.0),
                     ),
                   ),
-                  style: const TextStyle(color: Colors.black),
+                  style: GoogleFonts.roboto(color: Colors.black),
                 ),
               ),
               const SizedBox(height: 20),
@@ -128,9 +131,9 @@ class LoginPage extends StatelessWidget {
                           MaterialPageRoute(
                               builder: (context) => ForgotPasswordPage()));
                     },
-                    child: const Text(
+                    child: Text(
                       'Forgot Password?',
-                      style: TextStyle(color: Colors.white),
+                      style: GoogleFonts.roboto(color: Colors.white),
                     ),
                   ),
                 ),
@@ -155,8 +158,8 @@ class LoginPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(30.0),
                     ),
                   ),
-                  child: const Text('Login',
-                      style: TextStyle(color: Colors.white)),
+                  child: Text('Login',
+                      style: GoogleFonts.roboto(color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 20),
@@ -165,9 +168,9 @@ class LoginPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "Don't have an account?",
-                    style: TextStyle(color: Colors.white),
+                    style: GoogleFonts.roboto(color: Colors.white),
                   ),
                   TextButton(
                     onPressed: () {
@@ -176,9 +179,9 @@ class LoginPage extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => SignupPage()),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'Sign up',
-                      style: TextStyle(color: Colors.deepPurpleAccent),
+                      style: GoogleFonts.roboto(color: Colors.deepPurpleAccent),
                     ),
                   ),
                 ],

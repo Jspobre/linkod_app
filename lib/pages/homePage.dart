@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../widgets/drawer.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,27 +52,29 @@ class HomePage extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'Announcements',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               // Category Slider
               Container(
                 height: 50.0,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: <Widget>[
-                    categoryChip('News'),
-                    categoryChip('Events'),
-                    categoryChip('Updates'),
-                    categoryChip('Alerts'),
-                    categoryChip('Notifications'),
-                    categoryChip('Reminders'),
+                    categoryChip(0, 'News'),
+                    categoryChip(1, 'Events'),
+                    categoryChip(2, 'Updates'),
+                    categoryChip(3, 'Alerts'),
+                    categoryChip(4, 'Notifications'),
+                    categoryChip(5, 'Reminders'),
                   ],
                 ),
               ),
@@ -102,16 +112,89 @@ class HomePage extends StatelessWidget {
   }
 
   // Helper widget to create category chips
-  Widget categoryChip(String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Chip(
-        label: Text(
-          label,
-          style: TextStyle(color: Colors.white),
+  Widget categoryChip(int index, String label) {
+    bool isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isSelected
+                  ? [Color(0xFF4C51BF), Color(0xFF6B46C1)]
+                  : [Color(0xFF3C3C3C), Color(0xFF3C3C3C)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8.0,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0, vertical: 10.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    SizedBox(width: 8.0),
+                    Text(
+                      label,
+                      style: GoogleFonts.roboto(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Active category indicator
+              if (isSelected)
+                Positioned(
+                  right: -10,
+                  top: -10,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${index + 1}',
+                        style: TextStyle(
+                          color: Colors.deepPurpleAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
-        backgroundColor: Color(0xFF4C51BF),
-        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       ),
     );
   }
@@ -120,52 +203,76 @@ class HomePage extends StatelessWidget {
   Widget announcementCard() {
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: BorderRadius.circular(20.0), // Increased border radius
       ),
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            // Logo Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(
-                'images/lingkod_logo.png', // Path to your logo image
-                height: 80, // Adjust the size of the logo image
-                width: 80,
-                fit: BoxFit.cover,
+      elevation: 8, // Slightly increased elevation for a more pronounced shadow
+      shadowColor: Colors.black.withOpacity(0.2), // Softer shadow color
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Color(0xFFECECEC)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20.0), // Match border radius
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              // Logo Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(
+                    12.0), // Adjusted border radius for image
+                child: Image.asset(
+                  'images/lingkod_logo.png', // Path to your logo image
+                  height: 80, // Adjust the size of the logo image
+                  width: 80,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            SizedBox(width: 16),
-            // Description and Date/Time
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Exciting Update Available!',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF312E81),
+              SizedBox(width: 16),
+              // Description and Date/Time
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Exciting Update Available!',
+                      style: GoogleFonts.roboto(
+                        textStyle: TextStyle(
+                          fontSize:
+                              20, // Increased font size for better readability
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF312E81),
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'We have just released a new update with amazing features. Make sure to check it out!',
-                    style: TextStyle(fontSize: 14, color: Colors.black),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '20th August 2024, 10:00 AM',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    SizedBox(height: 8),
+                    Text(
+                      'We have just released a new update with amazing features. Make sure to check it out!',
+                      style: GoogleFonts.roboto(
+                        textStyle: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black), // Slightly larger font size
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '20th August 2024, 10:00 AM',
+                      style: GoogleFonts.roboto(
+                        textStyle: TextStyle(
+                            fontSize: 14,
+                            color: Colors
+                                .grey[600]), // Slightly adjusted grey color
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
