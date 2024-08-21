@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linkod_app/pages/eventPage.dart';
 
 class ProfilePage extends StatelessWidget {
   final TextEditingController firstNameController =
@@ -67,7 +68,10 @@ class ProfilePage extends StatelessWidget {
               leading: Icon(Icons.event, color: Colors.black, size: 30.0),
               title: Text('Events'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EventsPage()),
+                );
               },
             ),
             ListTile(
