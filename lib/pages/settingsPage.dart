@@ -20,7 +20,7 @@ class SettingsPage extends StatelessWidget {
             },
           ),
         ),
-        title: Text('Settings', style: TextStyle(color: Colors.white)),
+        // title: Text('Settings', style: TextStyle(color: Colors.white)),
       ),
       drawer: AppDrawer(),
       backgroundColor: Color(0xFF312E81),

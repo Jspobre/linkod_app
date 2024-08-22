@@ -81,6 +81,8 @@ class EventsPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 announcementCard(),
+                SizedBox(height: 16),
+                announcementCard(),
               ],
             ),
           ),
@@ -97,41 +99,102 @@ class EventsPage extends StatelessWidget {
       elevation: 5,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(
-                'images/lingkod_logo.png',
-                height: 80,
-                width: 80,
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Exciting Update Available!',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF312E81),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Basketball Game',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF312E81),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Handle "Remind Me" button press
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple, // Background color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    'We have just released a new update with amazing features. Make sure to check it out!',
-                    style: TextStyle(fontSize: 14, color: Colors.black),
+                  child: Text(
+                    'Remind Me',
+                    style: TextStyle(color: Colors.white),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    '20th August 2024, 10:00 AM',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today,
+                        color: Colors.deepPurple, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      '25th August 2024',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.access_time, color: Colors.deepPurple, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      '4:00 PM',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.location_on, color: Colors.deepPurple, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'City Sports Complex',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Text(
+              'Join us for an exciting basketball game at the City Sports Complex. Don\'t miss out on the action as top teams battle it out on the court. Enjoy a thrilling match and be part of the excitement!',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 12),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                '#fun #seeyou',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ],

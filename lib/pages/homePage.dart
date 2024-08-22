@@ -9,6 +9,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  bool _isChatOpen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,72 +42,212 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: AppDrawer(),
-      body: SingleChildScrollView(
-        child: Container(
-          color: Color(0xFF312E81),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text(
-                    'Announcements',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Container(
+              color: Color(0xFF312E81),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text(
+                        'Announcements',
+                        style: GoogleFonts.roboto(
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: 10),
-              // Category Slider
-              Container(
-                height: 50.0,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: <Widget>[
-                    categoryChip(0, 'News'),
-                    categoryChip(1, 'Events'),
-                    categoryChip(2, 'Updates'),
-                    categoryChip(3, 'Alerts'),
-                    categoryChip(4, 'Notifications'),
-                    categoryChip(5, 'Reminders'),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              // Announcement Cards
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: announcementCard(),
+                  SizedBox(height: 10),
+                  // Category Slider
+                  Container(
+                    height: 50.0,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        categoryChip(0, 'News'),
+                        categoryChip(1, 'Events'),
+                        categoryChip(2, 'Updates'),
+                        categoryChip(3, 'Alerts'),
+                        categoryChip(4, 'Notifications'),
+                        categoryChip(5, 'Reminders'),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: announcementCard(),
+                  SizedBox(height: 20),
+                  // Announcement Cards
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: announcementCard(),
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: announcementCard(),
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: announcementCard(),
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: announcementCard(),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: announcementCard(),
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: announcementCard(),
-                  ),
-                  const SizedBox(height: 10),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+          // Chatbot Floating Action Button
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                setState(() {
+                  _isChatOpen = !_isChatOpen;
+                });
+              },
+              backgroundColor: Colors.deepPurple,
+              icon: Icon(
+                _isChatOpen ? Icons.close : Icons.chat,
+                color: Colors.white,
+              ),
+              label: Text(
+                'Chat Now!',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+
+          if (_isChatOpen)
+            Positioned(
+              bottom: 80,
+              right: 20,
+              left: 20,
+              child: Material(
+                color: Colors.white,
+                elevation: 8.0,
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  height: 400,
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Chat with us!',
+                        style: GoogleFonts.roboto(
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.android, // Android robot icon
+                            size: 40,
+                            color: Colors.black,
+                          ),
+                          SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle "Request Barangay Documents"
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Request Barangay Documents',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle "Household Registration"
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Household Registration',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // Handle "Submit Blotter Report"
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.deepPurple,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Submit Blotter Report',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            // Add chat messages here
+                          ],
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Type your message...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(Icons.send, color: Colors.deepPurple),
+                            onPressed: () {
+                              // Handle sending message
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
