@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import './pages/loginPage.dart';
-import './pages/signupPage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -32,7 +34,6 @@ class MyHomePage extends StatelessWidget {
       backgroundColor: const Color(0xFF312E81),
       body: GestureDetector(
         onTap: () {
-          // Navigate to the Login page
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => LoginPage()),

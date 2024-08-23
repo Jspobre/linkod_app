@@ -36,7 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   table_calendar: ^3.1.2
   google_fonts: ^6.2.1
-
+  firebase_core: ^3.3.0
+  firebase_auth: ^5.1.4
+  cloud_firestore: ^5.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

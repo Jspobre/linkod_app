@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:299121262016:android:0935f961a02d8ebf5e1c25",
+        "android_client_info": {
+          "package_name": "com.example.linkod_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcMBY4CmPCws6G7wAyPJsYXSefeD32qyA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:299121262016:android:675418cea8d50ac55e1c25",
         "android_client_info": {
           "package_name": "lingkod.com"

@@ -1,17 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import './signupPage.dart';
 import './homePage.dart';
 import './forgotPassword.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> _signIn() async {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      print('Signed in: ${userCredential.user!.uid}');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } catch (e) {
+      print('Error: $e');
+      // Optionally show an error message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign in: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            const Color(0xFF312E81), // Matches the background color
-        elevation: 0, // Remove the shadow
+        backgroundColor: const Color(0xFF312E81),
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -19,25 +48,22 @@ class LoginPage extends StatelessWidget {
           },
         ),
       ),
-      backgroundColor: const Color(0xFF312E81), // Background color
+      backgroundColor: const Color(0xFF312E81),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center, // Align center
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              // Logo at the top
               Center(
                 child: Image.asset(
-                  'images/lingkod_logo.png', // Make sure this path is correct
+                  'images/lingkod_logo.png',
                   width: 170,
                   height: 170,
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Login Text
               Center(
                 child: Text(
                   'Login',
@@ -51,11 +77,10 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Email Field with specific width
               Container(
-                width: 350, // Set your desired width here
+                width: 350,
                 child: TextField(
+                  controller: _emailController,
                   decoration: InputDecoration(
                     prefixIcon:
                         Icon(Icons.email, color: Colors.deepPurpleAccent),
@@ -84,11 +109,10 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Password Field with specific width
               Container(
-                width: 350, // Set your desired width here
+                width: 350,
                 child: TextField(
+                  controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     prefixIcon:
@@ -118,8 +142,6 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Forgot Password
               Container(
                 width: 370,
                 child: Align(
@@ -127,9 +149,10 @@ class LoginPage extends StatelessWidget {
                   child: TextButton(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ForgotPasswordPage()));
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ForgotPasswordPage()),
+                      );
                     },
                     child: Text(
                       'Forgot Password?',
@@ -139,18 +162,10 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Login Button
               Container(
-                width: 250, // Set your desired width here
+                width: 250,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Implement login functionality
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                  },
+                  onPressed: _signIn,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurpleAccent,
                     padding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -163,8 +178,6 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Signup Button
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

@@ -1,7 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import './loginPage.dart';
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends StatefulWidget {
+  @override
+  _SignupPageState createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+
+  // Controllers for text fields
+  final _firstNameController = TextEditingController();
+  final _middleNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  Future<void> _signUp() async {
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      // Create user with email and password
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Add user data to Firestore
+      await _firestore.collection('users').doc(userCredential.user?.uid).set({
+        'firstName': _firstNameController.text.trim(),
+        'middleName': _middleNameController.text.trim(),
+        'lastName': _lastNameController.text.trim(),
+        'email': email,
+      });
+
+      // Navigate to LoginPage or other page
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      print(e); // Handle errors as needed (e.g., show a dialog or Snackbar)
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +71,6 @@ class SignupPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Logo
               Center(
                 child: Image.asset(
                   'images/lingkod_logo.png',
@@ -32,8 +79,6 @@ class SignupPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Create New Account Text
               const Center(
                 child: Text(
                   'Create New Account',
@@ -46,15 +91,13 @@ class SignupPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Form Fields Container
               Center(
                 child: Container(
                   width: 350,
                   child: Column(
                     children: [
-                      // First Name Field
                       TextField(
+                        controller: _firstNameController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -80,9 +123,8 @@ class SignupPage extends StatelessWidget {
                         style: const TextStyle(color: Colors.black),
                       ),
                       const SizedBox(height: 20),
-
-                      // Middle Name Field
                       TextField(
+                        controller: _middleNameController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -108,9 +150,8 @@ class SignupPage extends StatelessWidget {
                         style: const TextStyle(color: Colors.black),
                       ),
                       const SizedBox(height: 20),
-
-                      // Last Name Field
                       TextField(
+                        controller: _lastNameController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -136,9 +177,8 @@ class SignupPage extends StatelessWidget {
                         style: const TextStyle(color: Colors.black),
                       ),
                       const SizedBox(height: 20),
-
-                      // Email Field
                       TextField(
+                        controller: _emailController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -164,9 +204,8 @@ class SignupPage extends StatelessWidget {
                         style: const TextStyle(color: Colors.black),
                       ),
                       const SizedBox(height: 20),
-
-                      // Password Field
                       TextField(
+                        controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
                           filled: true,
@@ -197,15 +236,11 @@ class SignupPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 40),
-
-              // Signup Button Container
               Center(
                 child: Container(
                   width: 250,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Implement signup functionality
-                    },
+                    onPressed: _signUp,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.deepPurpleAccent,
                       padding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -219,8 +254,6 @@ class SignupPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Login Button
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
