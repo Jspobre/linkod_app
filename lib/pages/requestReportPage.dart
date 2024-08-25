@@ -6,7 +6,7 @@ class RequestPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF312E81), // Background color
+        backgroundColor: Color.fromARGB(255, 28, 25, 106), // Background color
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(
@@ -21,7 +21,7 @@ class RequestPage extends StatelessWidget {
         ),
       ),
       drawer: AppDrawer(),
-      backgroundColor: Color(0xFF312E81),
+      backgroundColor: Color.fromARGB(255, 28, 25, 106),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

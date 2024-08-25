@@ -13,33 +13,33 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<void> _signIn() async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      print('Signed in: ${userCredential.user!.uid}');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    } catch (e) {
-      print('Error: $e');
-      // Optionally show an error message to the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to sign in: $e')),
-      );
-    }
-  }
+  // Future<void> _signIn() async {
+  //   try {
+  //     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+  //       email: _emailController.text.trim(),
+  //       password: _passwordController.text.trim(),
+  //     );
+  //     print('Signed in: ${userCredential.user!.uid}');
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => HomePage()),
+  //     );
+  //   } catch (e) {
+  //     print('Error: $e');
+  //     // Optionally show an error message to the user
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Failed to sign in: $e')),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF312E81),
+        backgroundColor: Color.fromARGB(255, 28, 25, 106),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
           },
         ),
       ),
-      backgroundColor: const Color(0xFF312E81),
+      backgroundColor: const Color.fromARGB(255, 28, 25, 106),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
@@ -165,7 +165,13 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                 width: 250,
                 child: ElevatedButton(
-                  onPressed: _signIn,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
+                  // onPressed: _signIn,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurpleAccent,
                     padding: const EdgeInsets.symmetric(vertical: 15.0),

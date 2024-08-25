@@ -6,11 +6,11 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF312E81),
+        backgroundColor: const Color.fromARGB(255, 28, 25, 106),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.menu,
               color: Colors.white,
               size: 30.0,
@@ -20,10 +20,9 @@ class SettingsPage extends StatelessWidget {
             },
           ),
         ),
-        // title: Text('Settings', style: TextStyle(color: Colors.white)),
       ),
       drawer: AppDrawer(),
-      backgroundColor: Color(0xFF312E81),
+      backgroundColor: const Color.fromARGB(255, 28, 25, 106),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -34,13 +33,20 @@ class SettingsPage extends StatelessWidget {
               child: Text(
                 'Settings',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withOpacity(0.5),
+                      offset: Offset(2, 2),
+                      blurRadius: 4,
+                    ),
+                  ],
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 30),
             // Settings Sections
             Expanded(
               child: ListView(
@@ -107,22 +113,33 @@ class SettingsPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF4A4A9F), Color(0xFF6A6AD9)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 20),
         ...options,
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Divider(
           color: Colors.white.withOpacity(0.3),
           thickness: 1.0,
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -132,22 +149,34 @@ class SettingsPage extends StatelessWidget {
       required String title,
       required VoidCallback onTap}) {
     return ListTile(
-      leading: Icon(
-        icon,
-        color: Colors.white,
-        size: 24,
+      leading: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: [Color(0xFF4A4A9F), Color(0xFF6A6AD9)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 24,
+          ),
+        ),
       ),
       title: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 18,
         ),
       ),
       onTap: onTap,
-      contentPadding: EdgeInsets.symmetric(vertical: 10),
-      tileColor: Color(0xFF4C51BF)
-          .withOpacity(0.2), // Slightly different background color for items
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      tileColor: const Color(0xFF4C51BF).withOpacity(0.2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),

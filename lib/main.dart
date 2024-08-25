@@ -4,7 +4,7 @@ import './pages/loginPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -17,7 +17,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Landing Page',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFF312E81),
+          primary: Color(0xFF312E81), // Set primary color to match background
+          secondary: Color(
+              0xFF312E81), // Optional: set secondary color to match background
+        ),
         useMaterial3: true,
       ),
       home: const MyHomePage(),
@@ -31,7 +36,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF312E81),
+      backgroundColor: Color.fromARGB(255, 28, 25, 106),
       body: GestureDetector(
         onTap: () {
           Navigator.push(

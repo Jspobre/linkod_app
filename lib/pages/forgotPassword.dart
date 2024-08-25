@@ -7,7 +7,7 @@ class ForgotPasswordPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF312E81),
+        backgroundColor: Color.fromARGB(255, 28, 25, 106),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -17,7 +17,7 @@ class ForgotPasswordPage extends StatelessWidget {
       ),
       body: Center(
         child: Container(
-          color: Color(0xFF312E81),
+          color: Color.fromARGB(255, 28, 25, 106),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

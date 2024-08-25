@@ -4,6 +4,7 @@ import '../pages/profilePage.dart';
 import '../pages/eventPage.dart';
 import '../pages/requestReportPage.dart';
 import '../pages/settingsPage.dart';
+import '../pages/electricBillPage.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -64,6 +65,16 @@ class AppDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => RequestPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.report, color: Colors.black, size: 30.0),
+            title: Text('Electric Bill Notice'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ElectricBillPage()),
               );
             },
           ),

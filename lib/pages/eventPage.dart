@@ -7,7 +7,7 @@ class EventsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF312E81),
+        backgroundColor: Color.fromARGB(255, 28, 25, 106),
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
@@ -29,7 +29,7 @@ class EventsPage extends StatelessWidget {
             minHeight: MediaQuery.of(context).size.height,
           ),
           child: Container(
-            color: Color(0xFF312E81),
+            color: Color.fromARGB(255, 28, 25, 106),
             padding: EdgeInsets.all(16.0),
             child: Column(
               children: [

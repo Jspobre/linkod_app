@@ -28,6 +28,9 @@
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
+  <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js"></script>
 
   <title>linkod_app</title>
   <link rel="manifest" href="manifest.json">
@@ -36,3 +39,17 @@
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyA8ExVh9-fprauZRLqpVRuN_qa0pkDTt3Y",
+    authDomain: "lingkod-9cd97.firebaseapp.com",
+    projectId: "lingkod-9cd97",
+    storageBucket: "lingkod-9cd97.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "lingkod-9cd97"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>

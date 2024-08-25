@@ -21,7 +21,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF312E81),
+        backgroundColor: Color.fromARGB(255, 28, 25, 106),
         leading: Builder(
           builder: (context) => IconButton(
             icon: Icon(
@@ -38,7 +38,7 @@ class ProfilePage extends StatelessWidget {
       drawer: AppDrawer(),
       body: SingleChildScrollView(
         child: Container(
-          color: Color(0xFF312E81),
+          color: Color.fromARGB(255, 28, 25, 106),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
