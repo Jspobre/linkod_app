@@ -36,17 +36,33 @@ class _SignupPageState extends State<SignupPage> {
 
   //     // Create user with email and password
   //     UserCredential userCredential =
-  //         await _auth.createUserWithEmailAndPassword(
+  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
   //       email: email,
   //       password: password,
   //     );
 
+  //     // Upload the file to Firebase Storage (if a file was selected)
+  //     String? fileUrl;
+  //     if (_pickedFile != null) {
+  //       final storageRef = FirebaseStorage.instance
+  //           .ref()
+  //           .child('user_ids/${userCredential.user?.uid}/${_pickedFile?.name}');
+  //       final uploadTask = storageRef.putData(_pickedFile!.bytes!);
+
+  //       final snapshot = await uploadTask;
+  //       fileUrl = await snapshot.ref.getDownloadURL();
+  //     }
+
   //     // Add user data to Firestore
-  //     await _firestore.collection('users').doc(userCredential.user?.uid).set({
+  //     await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(userCredential.user?.uid)
+  //         .set({
   //       'firstName': _firstNameController.text.trim(),
   //       'middleName': _middleNameController.text.trim(),
   //       'lastName': _lastNameController.text.trim(),
   //       'email': email,
+  //       'fileUrl': fileUrl, // Save the file URL in Firestore
   //     });
 
   //     // Navigate to LoginPage or other page

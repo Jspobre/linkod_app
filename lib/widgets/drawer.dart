@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:linkod_app/pages/homePage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:linkod_app/pages/loginPage.dart'; // Update with your login page import
+import '../pages/homePage.dart';
 import '../pages/profilePage.dart';
 import '../pages/eventPage.dart';
 import '../pages/requestReportPage.dart';
@@ -15,7 +17,7 @@ class AppDrawer extends StatelessWidget {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Color(0xFF312E81),
+              color: Color.fromARGB(255, 28, 25, 106),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -91,8 +93,12 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.logout, color: Colors.black, size: 30.0),
             title: Text('Logout'),
-            onTap: () {
-              Navigator.pop(context);
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
             },
           ),
         ],

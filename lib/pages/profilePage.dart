@@ -1,21 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/drawer.dart';
 
-class ProfilePage extends StatelessWidget {
-  final TextEditingController firstNameController =
-      TextEditingController(text: 'John');
-  final TextEditingController middleNameController =
-      TextEditingController(text: 'Doe');
-  final TextEditingController lastNameController =
-      TextEditingController(text: 'Smith');
-  final TextEditingController birthdayController =
-      TextEditingController(text: '01/01/1990');
-  final TextEditingController civilStatusController =
-      TextEditingController(text: 'Single');
-  final TextEditingController zoneController =
-      TextEditingController(text: 'Zone 5');
-  final TextEditingController contactNumberController =
-      TextEditingController(text: '+1234567890');
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController middleNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController birthdayController = TextEditingController();
+  final TextEditingController civilStatusController = TextEditingController();
+  final TextEditingController zoneController = TextEditingController();
+  final TextEditingController contactNumberController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (userData.exists) {
+        setState(() {
+          firstNameController.text = userData['first_name'];
+          middleNameController.text = userData['middle_name'];
+          lastNameController.text = userData['last_name'];
+          birthdayController.text = userData['birthday'];
+          civilStatusController.text = userData['civil_status'];
+          zoneController.text = userData['zone'];
+          contactNumberController.text = userData['contact_number'];
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,23 +93,7 @@ class ProfilePage extends StatelessWidget {
               _buildTextField('Zone', zoneController),
               _buildTextField('Contact Number', contactNumberController),
               SizedBox(height: 20),
-              // ElevatedButton(
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor: Colors.white,
-              //     foregroundColor: Color(0xFF312E81),
-              //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(10.0),
-              //     ),
-              //   ),
-              //   onPressed: () {
-              //     // Add your update profile logic here
-              //   },
-              //   child: Text(
-              //     'Update Profile',
-              //     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              //   ),
-              // ),
+              // Add your update profile logic here
             ],
           ),
         ),

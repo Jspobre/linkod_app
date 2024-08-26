@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/drawer.dart';
 
-class EventsPage extends StatelessWidget {
+class EventsPage extends StatefulWidget {
+  @override
+  _EventsPageState createState() => _EventsPageState();
+}
+
+class _EventsPageState extends State<EventsPage> {
+  DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +31,7 @@ class EventsPage extends StatelessWidget {
           ),
         ),
       ),
-      drawer: AppDrawer(), // Use the AppDrawer here
+      drawer: AppDrawer(),
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -46,7 +55,16 @@ class EventsPage extends StatelessWidget {
                 TableCalendar(
                   firstDay: DateTime.utc(2020, 1, 1),
                   lastDay: DateTime.utc(2030, 12, 31),
-                  focusedDay: DateTime.now(),
+                  focusedDay: _focusedDay,
+                  selectedDayPredicate: (day) {
+                    return isSameDay(_selectedDay, day);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
                   calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
                       color: Colors.deepOrange,
@@ -75,14 +93,30 @@ class EventsPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  onDaySelected: (selectedDay, focusedDay) {
-                    // Handle date selection
-                  },
                 ),
                 SizedBox(height: 16),
-                announcementCard(),
-                SizedBox(height: 16),
-                announcementCard(),
+                StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('events')
+                      .where('category', isEqualTo: 'events')
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    return Column(
+                      children: snapshot.data!.docs.map((document) {
+                        return announcementCard(
+                          title: document['title'],
+                          date: document['date'].toDate(),
+                          time: document['time'],
+                          location: document['location'],
+                          description: document['description'],
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -91,7 +125,13 @@ class EventsPage extends StatelessWidget {
     );
   }
 
-  Widget announcementCard() {
+  Widget announcementCard({
+    required String title,
+    required DateTime date,
+    required String time,
+    required String location,
+    required String description,
+  }) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -106,7 +146,7 @@ class EventsPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Basketball Game',
+                  title,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -115,7 +155,10 @@ class EventsPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle "Remind Me" button press
+                    setState(() {
+                      _selectedDay = date;
+                      _focusedDay = date;
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple, // Background color
@@ -131,56 +174,50 @@ class EventsPage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today,
-                        color: Colors.deepPurple, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      '25th August 2024',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+                Icon(Icons.calendar_today, color: Colors.deepPurple, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  '${date.day}/${date.month}/${date.year}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
                 ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.access_time, color: Colors.deepPurple, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      '4:00 PM',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.access_time, color: Colors.deepPurple, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  time,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
                 ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, color: Colors.deepPurple, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'City Sports Complex',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.location_on, color: Colors.deepPurple, size: 20),
+                SizedBox(width: 8),
+                Text(
+                  location,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 12),
             Text(
-              'Join us for an exciting basketball game at the City Sports Complex. Don\'t miss out on the action as top teams battle it out on the court. Enjoy a thrilling match and be part of the excitement!',
+              description,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.black,
