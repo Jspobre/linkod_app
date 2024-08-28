@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart'; // Import for date formatting
 import '../widgets/drawer.dart';
 
 class ElectricBillPage extends StatelessWidget {
@@ -40,7 +41,8 @@ class ElectricBillPage extends StatelessWidget {
           }
 
           var billData = snapshot.data!.data() as Map<String, dynamic>;
-          return _buildBillCard(billData);
+          return _buildBillCard(
+              context, billData); // Pass context to the buildBillCard method
         },
       ),
     );
@@ -56,7 +58,11 @@ class ElectricBillPage extends StatelessWidget {
         .then((snapshot) => snapshot.docs.first);
   }
 
-  Widget _buildBillCard(Map<String, dynamic> billData) {
+  String _formatDate(Timestamp timestamp) {
+    return DateFormat('MMMM d, yyyy').format(timestamp.toDate());
+  }
+
+  Widget _buildBillCard(BuildContext context, Map<String, dynamic> billData) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -79,7 +85,8 @@ class ElectricBillPage extends StatelessWidget {
             const SizedBox(height: 40),
             Center(
               child: Container(
-                width: 350,
+                width: MediaQuery.of(context).size.width *
+                    0.9, // Adjust width to avoid overflow
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -128,36 +135,27 @@ class ElectricBillPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     _buildInfoRow(
                       'Month/Year',
-                      (billData['month'] as Timestamp)
-                          .toDate()
-                          .toLocal()
-                          .toString(),
+                      _formatDate(billData['month'] as Timestamp),
                     ),
                     const SizedBox(height: 10),
-                    _buildInfoRow('Total Amount', '₱ ${billData['total_due']}'),
+                    _buildInfoRow(
+                      'Total Amount',
+                      '₱ ${billData['total_due']}',
+                    ),
                     const SizedBox(height: 10),
                     _buildInfoRow(
                       'Date Released',
-                      (billData['date_released'] as Timestamp)
-                          .toDate()
-                          .toLocal()
-                          .toString(),
+                      _formatDate(billData['date_released'] as Timestamp),
                     ),
                     const SizedBox(height: 10),
                     _buildInfoRow(
                       'Due Date',
-                      (billData['due_date'] as Timestamp)
-                          .toDate()
-                          .toLocal()
-                          .toString(),
+                      _formatDate(billData['due_date'] as Timestamp),
                     ),
                     const SizedBox(height: 10),
                     _buildInfoRow(
                       'Disconnection Date',
-                      (billData['disconnection_date'] as Timestamp)
-                          .toDate()
-                          .toLocal()
-                          .toString(),
+                      _formatDate(billData['disconnection_date'] as Timestamp),
                     ),
                   ],
                 ),
@@ -173,22 +171,27 @@ class ElectricBillPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.lato(
-            textStyle: const TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+        Expanded(
+          child: Text(
+            label,
+            style: GoogleFonts.lato(
+              textStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
-        Text(
-          value,
-          style: GoogleFonts.lato(
-            textStyle: const TextStyle(
-              fontSize: 16,
-              color: Colors.white70,
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end, // Ensure text aligns correctly
+            style: GoogleFonts.lato(
+              textStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.white70,
+              ),
             ),
           ),
         ),

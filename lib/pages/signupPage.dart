@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
 import './loginPage.dart';
+import 'package:intl/intl.dart'; // Import for date formatting
 
 class SignupPage extends StatefulWidget {
   @override
@@ -16,6 +17,37 @@ class _SignupPageState extends State<SignupPage> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final TextEditingController _birthdayController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _civilStatusController = TextEditingController();
+  final TextEditingController _zoneController = TextEditingController();
+
+  DateTime? _selectedDate;
+  String _selectedCivilStatus = 'Single'; // Default value
+
+  final List<String> _civilStatuses = [
+    'Single',
+    'Married',
+    'Divorced',
+    'Widowed'
+  ];
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _birthdayController.text =
+            DateFormat('MMMM d, yyyy').format(_selectedDate!);
+      });
+    }
+  }
 
   String? _fileName;
 
@@ -181,6 +213,114 @@ class _SignupPageState extends State<SignupPage> {
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Last Name',
+                          prefixIcon: Icon(Icons.person, color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: 'Birthday',
+                          prefixIcon: Icon(Icons.person, color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: 'Age',
+                          prefixIcon: Icon(Icons.person, color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: 'Civil status',
+                          prefixIcon: Icon(Icons.person, color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.deepPurpleAccent,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                        style: const TextStyle(color: Colors.black),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: 'Zone',
                           prefixIcon: Icon(Icons.person, color: Colors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),

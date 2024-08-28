@@ -33,13 +33,23 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (userData.exists) {
         setState(() {
-          firstNameController.text = userData['first_name'];
-          middleNameController.text = userData['middle_name'];
-          lastNameController.text = userData['last_name'];
-          birthdayController.text = userData['birthday'];
-          civilStatusController.text = userData['civil_status'];
-          zoneController.text = userData['zone'];
-          contactNumberController.text = userData['contact_number'];
+          firstNameController.text = userData['first_name'] ?? '';
+          middleNameController.text = userData['middle_name'] ?? '';
+          lastNameController.text = userData['last_name'] ?? '';
+
+          // Handle timestamp for birthday
+          Timestamp? birthdayTimestamp = userData['birthday'];
+          birthdayController.text = birthdayTimestamp != null
+              ? birthdayTimestamp
+                  .toDate()
+                  .toLocal()
+                  .toString()
+                  .split(' ')[0] // Format to YYYY-MM-DD
+              : '';
+
+          civilStatusController.text = userData['civil_status'] ?? '';
+          zoneController.text = userData['zone'] ?? '';
+          contactNumberController.text = userData['contact_number'] ?? '';
         });
       }
     }
@@ -116,6 +126,30 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
+        keyboardType: labelText == 'Birthday'
+            ? TextInputType.datetime
+            : TextInputType.text,
+        // Add a tap event to show a date picker for the Birthday field
+        onTap: labelText == 'Birthday'
+            ? () async {
+                FocusScope.of(context)
+                    .requestFocus(FocusNode()); // Hide keyboard
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+                if (pickedDate != null) {
+                  setState(() {
+                    controller.text = pickedDate
+                        .toLocal()
+                        .toString()
+                        .split(' ')[0]; // Format to YYYY-MM-DD
+                  });
+                }
+              }
+            : null,
       ),
     );
   }

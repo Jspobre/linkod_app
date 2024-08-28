@@ -296,34 +296,33 @@ class _ChatBotState extends State<ChatBot> {
 
 // for barangay clearance document
   Widget _buildBarangayClearanceForm() {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController ageController = TextEditingController();
-    TextEditingController civilStatusController = TextEditingController();
-    TextEditingController zoneController = TextEditingController();
+    // TextEditingController nameController = TextEditingController();
+    // TextEditingController ageController = TextEditingController();
+    // TextEditingController civilStatusController = TextEditingController();
+    // TextEditingController zoneController = TextEditingController();
     TextEditingController purposeController = TextEditingController();
 
     return _buildChatBubble([
       Text(
-        'Please provide the following information:',
+        'Please provide the following information for barangay clearance:',
         style: TextStyle(
             color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
       ),
       SizedBox(height: 10),
-      _buildTextField('Name', nameController),
-      _buildTextField('Age', ageController),
-      _buildTextField('Civil Status', civilStatusController),
-      _buildTextField('Zone', zoneController),
+      // _buildTextField('Name', nameController),
+      // _buildTextField('Age', ageController),
+      // _buildTextField('Civil Status', civilStatusController),
+      // _buildTextField('Zone', zoneController),
       _buildTextField('Purpose', purposeController),
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
           _submitBarangayClearanceForm(
-            nameController.text.trim(),
-            ageController.text.trim(),
-            civilStatusController.text.trim(),
-            zoneController.text.trim(),
-            purposeController.text.trim(),
-          );
+              // nameController.text.trim(),
+              // ageController.text.trim(),
+              // civilStatusController.text.trim(),
+              // zoneController.text.trim(),
+              purposeController.text.trim());
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.deepPurple,
@@ -340,10 +339,10 @@ class _ChatBotState extends State<ChatBot> {
   }
 
   void _submitBarangayClearanceForm(
-    String name,
-    String age,
-    String civilStatus,
-    String zone,
+    // String name,
+    // String age,
+    // String civilStatus,
+    // String zone,
     String purpose,
   ) async {
     // Firebase Firestore instance
@@ -351,10 +350,10 @@ class _ChatBotState extends State<ChatBot> {
 
     try {
       await firestore.collection('barangay_clearance_requests').add({
-        'name': name,
-        'age': age,
-        'civil_status': civilStatus,
-        'zone': zone,
+        // 'name': name,
+        // 'age': age,
+        // 'civil_status': civilStatus,
+        // 'zone': zone,
         'purpose': purpose,
         'timestamp': FieldValue.serverTimestamp(),
       });

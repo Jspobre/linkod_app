@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/drawer.dart';
 import '../widgets/chatbot.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -97,18 +98,42 @@ class _HomePageState extends State<HomePage> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
+                        return Center(
+                          child: Text(
+                            'Error: ${snapshot.error}',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
                       }
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       }
 
-                      final events = snapshot.data!.docs;
+                      final events = snapshot.data?.docs ?? [];
+
+                      if (events.isEmpty) {
+                        return Container(
+                          color: Color.fromARGB(
+                              255, 28, 25, 106), // Retain background color
+                          child: Center(
+                            child: Text(
+                              'No data available',
+                              style: GoogleFonts.roboto(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
                       return Column(
                         children: events.map((doc) {
                           return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
                             child: announcementCard(doc),
                           );
                         }).toList(),
@@ -220,6 +245,10 @@ class _HomePageState extends State<HomePage> {
   Widget announcementCard(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
+    // Parse and format the date
+    DateTime eventDate = (data['event_date'] as Timestamp).toDate();
+    String formattedDate = DateFormat('MMMM d, yyyy').format(eventDate);
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
@@ -265,7 +294,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 8),
               // Date and Time
               Text(
-                '${data['event_date']?.toDate()} at ${data['event_time'] ?? 'No Time'}',
+                '$formattedDate at ${data['event_time'] ?? 'No Time'}',
                 style: GoogleFonts.roboto(
                   textStyle: TextStyle(
                     fontSize: 14,
