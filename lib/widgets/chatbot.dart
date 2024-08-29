@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart'; // Import this for date formatting
 
 class ChatBot extends StatefulWidget {
   @override
@@ -64,6 +66,12 @@ class _ChatBotState extends State<ChatBot> {
     }
     if (option == 'Barangay Clearance') {
       _addChatMessage(_buildBarangayClearanceForm());
+    } else if (option == 'Business Permit') {
+      _addChatMessage(_buildBusinessPermitForm());
+    } else if (option == 'Certificate of Indigency') {
+      _addChatMessage(_buildHouseholdRegistrationForm());
+    } else if (option == 'Event Permit') {
+      _addChatMessage(_buildHouseholdRegistrationForm());
     } else if (option == 'Household Registration') {
       _addChatMessage(_buildHouseholdRegistrationForm());
     } else if (option == 'Submit Blotter Report') {
@@ -86,40 +94,21 @@ class _ChatBotState extends State<ChatBot> {
         _showBarangayDocOptions();
       } else if (userMessage.toLowerCase() == 'household registration') {
         // Handle Household Registration options
-        _addChatMessage(
-          _buildChatBubble(
-            [
-              Text(
-                'Household Registration',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              // Add more options if necessary
-            ],
-          ),
-        );
+        _addChatMessage(_buildHouseholdRegistrationForm());
       } else if (userMessage.toLowerCase() == 'submit blotter report') {
         // Handle Submit Blotter Report options
-        _addChatMessage(
-          _buildChatBubble(
-            [
-              Text(
-                'Submit Blotter Report',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              // Add more options if necessary
-            ],
-          ),
-        );
+        _addChatMessage(_buildBlotterReportForm());
       } else if (userMessage.toLowerCase() == 'barangay clearance') {
         _addChatMessage(_buildBarangayClearanceForm());
+      } else if (userMessage.toLowerCase() == 'business permit') {
+        // Handle Household Registration options
+        _addChatMessage(_buildBusinessPermitForm());
+      } else if (userMessage.toLowerCase() == 'certificate of indigency') {
+        // Handle Household Registration options
+        _addChatMessage(_buildHouseholdRegistrationForm());
+      } else if (userMessage.toLowerCase() == 'event permit') {
+        // Handle Household Registration options
+        _addChatMessage(_buildHouseholdRegistrationForm());
       }
     }
   }
@@ -296,10 +285,10 @@ class _ChatBotState extends State<ChatBot> {
 
 // for barangay clearance document
   Widget _buildBarangayClearanceForm() {
-    // TextEditingController nameController = TextEditingController();
-    // TextEditingController ageController = TextEditingController();
-    // TextEditingController civilStatusController = TextEditingController();
-    // TextEditingController zoneController = TextEditingController();
+    TextEditingController nameController = TextEditingController();
+    TextEditingController ageController = TextEditingController();
+    TextEditingController civilStatusController = TextEditingController();
+    TextEditingController zoneController = TextEditingController();
     TextEditingController purposeController = TextEditingController();
 
     return _buildChatBubble([
@@ -309,19 +298,19 @@ class _ChatBotState extends State<ChatBot> {
             color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
       ),
       SizedBox(height: 10),
-      // _buildTextField('Name', nameController),
-      // _buildTextField('Age', ageController),
-      // _buildTextField('Civil Status', civilStatusController),
-      // _buildTextField('Zone', zoneController),
+      _buildTextField('Name', nameController),
+      _buildTextField('Age', ageController),
+      _buildTextField('Civil Status', civilStatusController),
+      _buildTextField('Zone', zoneController),
       _buildTextField('Purpose', purposeController),
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
           _submitBarangayClearanceForm(
-              // nameController.text.trim(),
-              // ageController.text.trim(),
-              // civilStatusController.text.trim(),
-              // zoneController.text.trim(),
+              nameController.text.trim(),
+              ageController.text.trim(),
+              civilStatusController.text.trim(),
+              zoneController.text.trim(),
               purposeController.text.trim());
         },
         style: ElevatedButton.styleFrom(
@@ -339,48 +328,185 @@ class _ChatBotState extends State<ChatBot> {
   }
 
   void _submitBarangayClearanceForm(
-    // String name,
-    // String age,
-    // String civilStatus,
-    // String zone,
+    String fullName,
+    String age,
+    String civilStatus,
+    String zone,
     String purpose,
   ) async {
-    // Firebase Firestore instance
+    // Firebase Firestore and Auth instances
     FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
 
     try {
-      await firestore.collection('barangay_clearance_requests').add({
-        // 'name': name,
-        // 'age': age,
-        // 'civil_status': civilStatus,
-        // 'zone': zone,
-        'purpose': purpose,
-        'timestamp': FieldValue.serverTimestamp(),
+      // Get the current user's UID
+      String? uid = auth.currentUser?.uid;
+
+      await firestore.collection('requests').add({
+        'full_name': fullName,
+        'status': 'pending',
+        'type': 'Barangay Clearance',
+        'date_requested': FieldValue.serverTimestamp(),
+        'uid': uid, // Add UID to the Firestore document
+        'details': {
+          'age': age,
+          'civil_status': civilStatus,
+          'zone': zone,
+          'purpose': purpose,
+          // Additional fields can be added to details if needed
+        },
       });
 
-      // Show confirmation message in the chat
-      _addChatMessage(_buildChatBubble([
-        Text(
-          'Your Barangay Clearance request has been submitted successfully!',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ]));
+      // Show confirmation toast message
+      Fluttertoast.showToast(
+        msg: "Your Barangay Clearance request has been submitted successfully!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     } catch (e) {
-      // Handle error and show message in the chat
-      _addChatMessage(_buildChatBubble([
-        Text(
-          'Failed to submit your request. Please try again later.',
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
+      // Handle error and show error toast message
+      Fluttertoast.showToast(
+        msg: "Failed to submit your request. Please try again later.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
+
+  Widget _buildBusinessPermitForm() {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController addressController = TextEditingController();
+    TextEditingController businessLocationController = TextEditingController();
+    TextEditingController natureOfBusinessController = TextEditingController();
+    TextEditingController businessStatusController = TextEditingController();
+    TextEditingController permitNoController = TextEditingController();
+    TextEditingController amountPaidController = TextEditingController();
+    TextEditingController validUntilController = TextEditingController();
+
+    return _buildChatBubble([
+      Text(
+        'Please provide the following information for the business permit:',
+        style: TextStyle(
+            color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10),
+      _buildTextField('Proprietor Name', nameController),
+      _buildTextField('Address', addressController),
+      _buildTextField('Business Location', businessLocationController),
+      _buildTextField('Nature of Business', natureOfBusinessController),
+      _buildTextField('Status', businessStatusController),
+      _buildTextField('Permit Number', permitNoController),
+      _buildTextField('Amount Paid', amountPaidController),
+      GestureDetector(
+        onTap: () async {
+          DateTime? selectedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2101),
+          );
+          if (selectedDate != null) {
+            // Format the date to "August 22, 2024"
+            String formattedDate =
+                DateFormat('MMMM d, yyyy').format(selectedDate);
+            validUntilController.text = formattedDate;
+          }
+        },
+        child: AbsorbPointer(
+          child: _buildTextField('Valid Until', validUntilController),
+        ),
+      ),
+      SizedBox(height: 10),
+      ElevatedButton(
+        onPressed: () {
+          _submitBusinessPermitForm(
+            nameController.text.trim(),
+            addressController.text.trim(),
+            businessLocationController.text.trim(),
+            natureOfBusinessController.text.trim(),
+            businessStatusController.text.trim(),
+            permitNoController.text.trim(),
+            double.tryParse(amountPaidController.text.trim()) ?? 0.0,
+            validUntilController.text.trim(),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
-      ]));
+        child: Text(
+          'Submit',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    ]);
+  }
+
+  void _submitBusinessPermitForm(
+    String proprietor,
+    String address,
+    String businessLocation,
+    String natureOfBusiness,
+    String status,
+    String permitNo,
+    double amountPaid,
+    String validUntil,
+  ) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    try {
+      // Get the current user's UID
+      String? uid = auth.currentUser?.uid;
+
+      // Parse the date back from the formatted string
+      DateTime validUntilDate = DateFormat('MMMM d, yyyy').parse(validUntil);
+
+      await firestore.collection('requests').add({
+        'full_name': proprietor,
+        'address': address,
+        'status': status,
+        'type': 'Business Permit',
+        'date_requested': FieldValue.serverTimestamp(),
+        'uid': uid, // Add UID to the Firestore document
+        'details': {
+          'business_location': businessLocation,
+          'nature_of_business': natureOfBusiness,
+          'permit_no': permitNo,
+          'amount_paid': amountPaid,
+          'status': 'Operating',
+          'valid_until':
+              Timestamp.fromDate(validUntilDate), // Adjusted for Firestore
+        },
+      });
+
+      // Show confirmation toast message
+      Fluttertoast.showToast(
+        msg: "Your Business Permit request has been submitted successfully!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      // Handle error and show error toast message
+      Fluttertoast.showToast(
+        msg: "Failed to submit your request. Please try again later.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 

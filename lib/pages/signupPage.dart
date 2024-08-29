@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
 import './loginPage.dart';
 import 'package:intl/intl.dart'; // Import for date formatting
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -23,14 +24,14 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _zoneController = TextEditingController();
 
   DateTime? _selectedDate;
-  String _selectedCivilStatus = 'Single'; // Default value
+  String? _selectedCivilStatus;
 
-  final List<String> _civilStatuses = [
-    'Single',
-    'Married',
-    'Divorced',
-    'Widowed'
-  ];
+  // final List<String> _civilStatuses = [
+  //   'Single',
+  //   'Married',
+  //   'Divorced',
+  //   'Widowed'
+  // ];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -61,51 +62,46 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  // Future<void> _signUp() async {
-  //   try {
-  //     final email = _emailController.text.trim();
-  //     final password = _passwordController.text.trim();
+  Future<void> signUp() async {
+    try {
+      // Assume you have some Firebase authentication logic here
+      // Example:
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-  //     // Create user with email and password
-  //     UserCredential userCredential =
-  //         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-  //       email: email,
-  //       password: password,
-  //     );
+      // Additional logic like saving user details to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user?.uid)
+          .set({
+        'first_name': _firstNameController.text.trim(),
+        'middle_name': _middleNameController.text.trim(),
+        'last_name': _lastNameController.text.trim(),
+        'birthday': _birthdayController.text.trim(),
+        'age': _ageController.text.trim(),
+        'civil_status': _civilStatusController.text.trim(),
+        'zone': _zoneController.text.trim(),
+        // Add other fields as needed
+      });
 
-  //     // Upload the file to Firebase Storage (if a file was selected)
-  //     String? fileUrl;
-  //     if (_pickedFile != null) {
-  //       final storageRef = FirebaseStorage.instance
-  //           .ref()
-  //           .child('user_ids/${userCredential.user?.uid}/${_pickedFile?.name}');
-  //       final uploadTask = storageRef.putData(_pickedFile!.bytes!);
-
-  //       final snapshot = await uploadTask;
-  //       fileUrl = await snapshot.ref.getDownloadURL();
-  //     }
-
-  //     // Add user data to Firestore
-  //     await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(userCredential.user?.uid)
-  //         .set({
-  //       'firstName': _firstNameController.text.trim(),
-  //       'middleName': _middleNameController.text.trim(),
-  //       'lastName': _lastNameController.text.trim(),
-  //       'email': email,
-  //       'fileUrl': fileUrl, // Save the file URL in Firestore
-  //     });
-
-  //     // Navigate to LoginPage or other page
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => LoginPage()),
-  //     );
-  //   } catch (e) {
-  //     print(e); // Handle errors as needed (e.g., show a dialog or Snackbar)
-  //   }
-  // }
+      // Show success toast
+      Fluttertoast.showToast(
+        msg: "Signup successful!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      // Handle error (optional)
+      print(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -235,12 +231,16 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: _lastNameController,
+                        controller:
+                            _birthdayController, // Changed from _lastNameController
+                        readOnly: true, // Makes the TextField non-editable
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
                           hintText: 'Birthday',
-                          prefixIcon: Icon(Icons.person, color: Colors.grey),
+                          prefixIcon: Icon(Icons.cake,
+                              color: Colors
+                                  .grey), // Changed icon to represent birthday
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
                             borderSide: BorderSide.none,
@@ -259,6 +259,21 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                         ),
                         style: const TextStyle(color: Colors.black),
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime(2101),
+                          );
+
+                          if (pickedDate != null) {
+                            String formattedDate =
+                                DateFormat('MMMM dd, yyyy').format(pickedDate);
+                            _birthdayController.text =
+                                formattedDate; // Set the selected date to the text field
+                          }
+                        },
                       ),
                       const SizedBox(height: 20),
                       TextField(
@@ -288,12 +303,10 @@ class _SignupPageState extends State<SignupPage> {
                         style: const TextStyle(color: Colors.black),
                       ),
                       const SizedBox(height: 20),
-                      TextField(
-                        controller: _lastNameController,
+                      DropdownButtonFormField<String>(
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: 'Civil status',
                           prefixIcon: Icon(Icons.person, color: Colors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
@@ -313,6 +326,25 @@ class _SignupPageState extends State<SignupPage> {
                           ),
                         ),
                         style: const TextStyle(color: Colors.black),
+                        hint: Text(
+                            'Civil status'), // Use the hint property for placeholder
+                        value: _selectedCivilStatus,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedCivilStatus = newValue!;
+                          });
+                        },
+                        items: <String>[
+                          'Single',
+                          'Married',
+                          'Divorced',
+                          'Widowed'
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                       ),
                       const SizedBox(height: 20),
                       TextField(

@@ -101,11 +101,23 @@ class _EventsPageState extends State<EventsPage> {
                       .where('category', isEqualTo: 'events')
                       .snapshots(),
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
                     }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return Center(child: Text('No events found.'));
+                    }
+
+                    // Print the documents to the console
+                    print("Documents: ${snapshot.data!.docs}");
+
                     return Column(
                       children: snapshot.data!.docs.map((document) {
+                        print("Document Data: ${document.data()}");
+
                         return announcementCard(
                           title: document['title'],
                           date: document['date'].toDate(),
@@ -116,7 +128,7 @@ class _EventsPageState extends State<EventsPage> {
                       }).toList(),
                     );
                   },
-                ),
+                )
               ],
             ),
           ),
