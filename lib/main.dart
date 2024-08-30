@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
               0xFF312E81), // Optional: set secondary color to match background
         ),
         useMaterial3: true,
+        scaffoldBackgroundColor: Color.fromARGB(255, 28, 25, 106),
       ),
       home: const MyHomePage(),
     );

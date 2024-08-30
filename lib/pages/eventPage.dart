@@ -11,6 +11,42 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
+  Map<DateTime, List<Map<String, dynamic>>> _events = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvents();
+  }
+
+  void _fetchEvents() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('events')
+        .where('category', isEqualTo: 'Events')
+        .get();
+
+    final events = snapshot.docs.map((doc) {
+      return {
+        'title': doc['title'],
+        'date': (doc['event_date'] as Timestamp).toDate(),
+        'time': doc['event_time'],
+        'location': doc['event_location'],
+        'description': doc['description'],
+        'image': doc['event_pic'],
+      };
+    }).toList();
+
+    Map<DateTime, List<Map<String, dynamic>>> eventMap = {};
+
+    for (var event in events) {
+      DateTime eventDate = event['date'];
+      eventMap.putIfAbsent(eventDate, () => []).add(event);
+    }
+
+    setState(() {
+      _events = eventMap;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +101,9 @@ class _EventsPageState extends State<EventsPage> {
                       _focusedDay = focusedDay;
                     });
                   },
+                  eventLoader: (day) {
+                    return _events[day] ?? [];
+                  },
                   calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
                       color: Colors.deepOrange,
@@ -95,40 +134,17 @@ class _EventsPageState extends State<EventsPage> {
                   ),
                 ),
                 SizedBox(height: 16),
-                StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('events')
-                      .where('category', isEqualTo: 'events')
-                      .snapshots(),
-                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No events found.'));
-                    }
-
-                    // Print the documents to the console
-                    print("Documents: ${snapshot.data!.docs}");
-
-                    return Column(
-                      children: snapshot.data!.docs.map((document) {
-                        print("Document Data: ${document.data()}");
-
-                        return announcementCard(
-                          title: document['title'],
-                          date: document['date'].toDate(),
-                          time: document['time'],
-                          location: document['location'],
-                          description: document['description'],
-                        );
-                      }).toList(),
+                if (_events[_selectedDay] != null)
+                  ..._events[_selectedDay]!.map((event) {
+                    return announcementCard(
+                      title: event['title'],
+                      date: event['date'],
+                      time: event['time'],
+                      location: event['location'],
+                      description: event['description'],
+                      imageUrl: event['image'],
                     );
-                  },
-                )
+                  }).toList(),
               ],
             ),
           ),
@@ -143,6 +159,7 @@ class _EventsPageState extends State<EventsPage> {
     required String time,
     required String location,
     required String description,
+    required String imageUrl,
   }) {
     return Card(
       shape: RoundedRectangleBorder(
@@ -186,12 +203,19 @@ class _EventsPageState extends State<EventsPage> {
               ],
             ),
             SizedBox(height: 12),
+            Image.network(
+              imageUrl,
+              height: 150,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            SizedBox(height: 12),
             Row(
               children: [
                 Icon(Icons.calendar_today, color: Colors.deepPurple, size: 20),
                 SizedBox(width: 8),
                 Text(
-                  '${date.day}/${date.month}/${date.year}',
+                  '${_formatDate(date)}',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.black,
@@ -250,5 +274,42 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    // Format date as "August 22, 2024"
+    return "${_monthName(date.month)} ${date.day}, ${date.year}";
+  }
+
+  String _monthName(int month) {
+    // Return month name based on month number
+    switch (month) {
+      case 1:
+        return "January";
+      case 2:
+        return "February";
+      case 3:
+        return "March";
+      case 4:
+        return "April";
+      case 5:
+        return "May";
+      case 6:
+        return "June";
+      case 7:
+        return "July";
+      case 8:
+        return "August";
+      case 9:
+        return "September";
+      case 10:
+        return "October";
+      case 11:
+        return "November";
+      case 12:
+        return "December";
+      default:
+        return "Unknown";
+    }
   }
 }

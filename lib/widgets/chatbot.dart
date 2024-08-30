@@ -299,19 +299,31 @@ class _ChatBotState extends State<ChatBot> {
       ),
       SizedBox(height: 10),
       _buildTextField('Name', nameController),
+      const SizedBox(height: 10),
       _buildTextField('Age', ageController),
+      const SizedBox(height: 10),
       _buildTextField('Civil Status', civilStatusController),
+      const SizedBox(height: 10),
       _buildTextField('Zone', zoneController),
+      const SizedBox(height: 10),
       _buildTextField('Purpose', purposeController),
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
           _submitBarangayClearanceForm(
-              nameController.text.trim(),
-              ageController.text.trim(),
-              civilStatusController.text.trim(),
-              zoneController.text.trim(),
-              purposeController.text.trim());
+            nameController.text.trim(),
+            ageController.text.trim(),
+            civilStatusController.text.trim(),
+            zoneController.text.trim(),
+            purposeController.text.trim(),
+          );
+
+          // Clear the text fields after submission
+          nameController.clear();
+          ageController.clear();
+          civilStatusController.clear();
+          zoneController.clear();
+          purposeController.clear();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.deepPurple,
@@ -344,7 +356,7 @@ class _ChatBotState extends State<ChatBot> {
 
       await firestore.collection('requests').add({
         'full_name': fullName,
-        'status': 'pending',
+        'status': 'Pending',
         'type': 'Barangay Clearance',
         'date_requested': FieldValue.serverTimestamp(),
         'uid': uid, // Add UID to the Firestore document
@@ -397,12 +409,19 @@ class _ChatBotState extends State<ChatBot> {
       ),
       SizedBox(height: 10),
       _buildTextField('Proprietor Name', nameController),
+      const SizedBox(height: 10),
       _buildTextField('Address', addressController),
+      const SizedBox(height: 10),
       _buildTextField('Business Location', businessLocationController),
+      const SizedBox(height: 10),
       _buildTextField('Nature of Business', natureOfBusinessController),
+      const SizedBox(height: 10),
       _buildTextField('Status', businessStatusController),
+      const SizedBox(height: 10),
       _buildTextField('Permit Number', permitNoController),
+      const SizedBox(height: 10),
       _buildTextField('Amount Paid', amountPaidController),
+      const SizedBox(height: 10),
       GestureDetector(
         onTap: () async {
           DateTime? selectedDate = await showDatePicker(
@@ -435,6 +454,16 @@ class _ChatBotState extends State<ChatBot> {
             double.tryParse(amountPaidController.text.trim()) ?? 0.0,
             validUntilController.text.trim(),
           );
+
+          // Clear the text fields after submission
+          nameController.clear();
+          addressController.clear();
+          businessLocationController.clear();
+          natureOfBusinessController.clear();
+          businessStatusController.clear();
+          permitNoController.clear();
+          amountPaidController.clear();
+          validUntilController.clear();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.deepPurple,
@@ -510,16 +539,20 @@ class _ChatBotState extends State<ChatBot> {
     }
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller, {
+    void Function()? onTap,
+    bool readOnly = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
         ),
       ),
     );
@@ -540,8 +573,11 @@ class _ChatBotState extends State<ChatBot> {
       ),
       SizedBox(height: 10),
       _buildTextField('Household Head', householdHeadController),
+      const SizedBox(height: 10),
       _buildTextField('Address', addressController),
+      const SizedBox(height: 10),
       _buildTextField('Number of Members', numOfMembersController),
+      const SizedBox(height: 10),
       _buildTextField('Contact Number', contactNumberController),
       SizedBox(height: 10),
       ElevatedButton(
@@ -610,11 +646,12 @@ class _ChatBotState extends State<ChatBot> {
 
 // BLOTTER FORM
   Widget _buildBlotterReportForm() {
-    TextEditingController complainantNameController = TextEditingController();
-    TextEditingController respondentNameController = TextEditingController();
-    TextEditingController incidentDetailsController = TextEditingController();
-    TextEditingController incidentLocationController = TextEditingController();
-    TextEditingController incidentDateController = TextEditingController();
+    TextEditingController whatController = TextEditingController();
+    TextEditingController whereController = TextEditingController();
+    TextEditingController whenController = TextEditingController();
+    TextEditingController whyController = TextEditingController();
+    TextEditingController howController = TextEditingController();
+    TextEditingController complainantController = TextEditingController();
 
     return _buildChatBubble([
       Text(
@@ -623,21 +660,55 @@ class _ChatBotState extends State<ChatBot> {
             color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
       ),
       SizedBox(height: 10),
-      _buildTextField('Complainant Name', complainantNameController),
-      _buildTextField('Respondent Name', respondentNameController),
-      _buildTextField('Incident Details', incidentDetailsController),
-      _buildTextField('Incident Location', incidentLocationController),
-      _buildTextField('Incident Date', incidentDateController),
+      _buildTextField('What', whatController),
+      const SizedBox(height: 10),
+      _buildTextField('Where', whereController),
+      const SizedBox(height: 10),
+      _buildTextField(
+        'When',
+        whenController,
+        onTap: () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2101),
+          );
+          if (pickedDate != null) {
+            setState(() {
+              whenController.text =
+                  DateFormat('MMMM dd, yyyy').format(pickedDate);
+            });
+          }
+        },
+        readOnly: true,
+      ),
+      const SizedBox(height: 10),
+      _buildTextField('Why', whyController),
+      const SizedBox(height: 10),
+      _buildTextField('How', howController),
+      const SizedBox(height: 10),
+      _buildTextField('Complainant', complainantController),
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
           _submitBlotterReportForm(
-            complainantNameController.text.trim(),
-            respondentNameController.text.trim(),
-            incidentDetailsController.text.trim(),
-            incidentLocationController.text.trim(),
-            incidentDateController.text.trim(),
+            whatController.text.trim(),
+            whereController.text.trim(),
+            whenController.text.trim(),
+            whyController.text.trim(),
+            howController.text.trim(),
+            complainantController.text.trim(),
           );
+          // Clear the form fields
+          setState(() {
+            whatController.clear();
+            whereController.clear();
+            whenController.clear();
+            whyController.clear();
+            howController.clear();
+            complainantController.clear();
+          });
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.deepPurple,
@@ -654,21 +725,28 @@ class _ChatBotState extends State<ChatBot> {
   }
 
   void _submitBlotterReportForm(
-    String complainantName,
-    String respondentName,
-    String incidentDetails,
-    String incidentLocation,
-    String incidentDate,
+    String what,
+    String where,
+    String when,
+    String why,
+    String how,
+    String complainant,
   ) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DateTime now = DateTime.now();
+    String reportedDate = DateFormat('MMMM dd, yyyy').format(now);
+    String reportedTime = DateFormat('hh:mm a').format(now);
 
     try {
       await firestore.collection('blotter_reports').add({
-        'complainant_name': complainantName,
-        'respondent_name': respondentName,
-        'incident_details': incidentDetails,
-        'incident_location': incidentLocation,
-        'incident_date': incidentDate,
+        'reported_date': reportedDate,
+        'reported_time': reportedTime,
+        'what': what,
+        'where': where,
+        'when': when,
+        'why': why,
+        'how': how,
+        'complainant': complainant,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
@@ -682,6 +760,15 @@ class _ChatBotState extends State<ChatBot> {
           ),
         ),
       ]));
+
+      Fluttertoast.showToast(
+        msg: "Blotter Report submitted successfully!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     } catch (e) {
       _addChatMessage(_buildChatBubble([
         Text(
@@ -693,6 +780,15 @@ class _ChatBotState extends State<ChatBot> {
           ),
         ),
       ]));
+
+      Fluttertoast.showToast(
+        msg: "Failed to submit Blotter Report.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 }

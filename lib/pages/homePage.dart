@@ -251,10 +251,6 @@ class _HomePageState extends State<HomePage> {
   Widget announcementCard(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
-    // Parse and format the date
-    DateTime eventDate = (data['event_date'] as Timestamp).toDate();
-    String formattedDate = DateFormat('MMMM d, yyyy').format(eventDate);
-
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
@@ -264,10 +260,7 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 28, 25, 106), // Match the background color
-              Color.fromARGB(255, 28, 25, 106)
-            ],
+            colors: [Colors.white, Color(0xFFECECEC)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -296,18 +289,18 @@ class _HomePageState extends State<HomePage> {
                 style: GoogleFonts.roboto(
                   textStyle: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
               ),
               SizedBox(height: 8),
               // Date and Time
               Text(
-                '$formattedDate at ${data['event_time'] ?? 'No Time'}',
+                '${data['event_date']?.toDate()} at ${data['event_time'] ?? 'No Time'}',
                 style: GoogleFonts.roboto(
                   textStyle: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[300],
+                    color: Colors.grey[600],
                   ),
                 ),
               ),
@@ -318,7 +311,7 @@ class _HomePageState extends State<HomePage> {
                 style: GoogleFonts.roboto(
                   textStyle: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[300],
+                    color: Colors.grey[600],
                   ),
                 ),
               ),

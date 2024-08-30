@@ -277,7 +277,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: _lastNameController,
+                        controller: _ageController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
@@ -348,7 +348,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: _lastNameController,
+                        controller: _zoneController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
