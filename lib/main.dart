@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import './pages/loginPage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
               0xFF312E81), // Optional: set secondary color to match background
         ),
         useMaterial3: true,
+        textTheme: GoogleFonts.poppinsTextTheme(),
         scaffoldBackgroundColor: Color.fromARGB(255, 28, 25, 106),
       ),
       home: const MyHomePage(),

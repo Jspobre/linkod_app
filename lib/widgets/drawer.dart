@@ -7,6 +7,7 @@ import '../pages/eventPage.dart';
 import '../pages/requestReportPage.dart';
 import '../pages/settingsPage.dart';
 import '../pages/electricBillPage.dart';
+import '../pages/testPage.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -87,6 +88,16 @@ class AppDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.settings, color: Colors.black, size: 30.0),
+            title: Text('Test'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignupPageTest()),
               );
             },
           ),

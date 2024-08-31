@@ -502,7 +502,7 @@ class _ChatBotState extends State<ChatBot> {
       await firestore.collection('requests').add({
         'full_name': proprietor,
         'address': address,
-        'status': status,
+        'status': 'pending',
         'type': 'Business Permit',
         'date_requested': FieldValue.serverTimestamp(),
         'uid': uid, // Add UID to the Firestore document
@@ -510,8 +510,9 @@ class _ChatBotState extends State<ChatBot> {
           'business_location': businessLocation,
           'nature_of_business': natureOfBusiness,
           'permit_no': permitNo,
+          'proprietor': proprietor,
           'amount_paid': amountPaid,
-          'status': 'Operating',
+          'status': status,
           'valid_until':
               Timestamp.fromDate(validUntilDate), // Adjusted for Firestore
         },

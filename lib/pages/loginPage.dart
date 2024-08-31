@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
               Center(
                 child: Text(
                   'Login',
-                  style: GoogleFonts.roboto(
+                  style: GoogleFonts.poppins(
                     textStyle: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                     filled: true,
                     fillColor: Colors.white,
                     hintText: 'Email',
-                    hintStyle: GoogleFonts.roboto(color: Colors.grey),
+                    hintStyle: GoogleFonts.poppins(color: Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                       borderSide: BorderSide.none,
@@ -105,7 +105,7 @@ class _LoginPageState extends State<LoginPage> {
                           BorderSide(color: Colors.grey.shade300, width: 1.0),
                     ),
                   ),
-                  style: GoogleFonts.roboto(color: Colors.black),
+                  style: GoogleFonts.poppins(color: Colors.black),
                 ),
               ),
               const SizedBox(height: 20),
@@ -120,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                     filled: true,
                     fillColor: Colors.white,
                     hintText: 'Password',
-                    hintStyle: GoogleFonts.roboto(color: Colors.grey),
+                    hintStyle: GoogleFonts.poppins(color: Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
                       borderSide: BorderSide.none,
@@ -138,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                           BorderSide(color: Colors.grey.shade300, width: 1.0),
                     ),
                   ),
-                  style: GoogleFonts.roboto(color: Colors.black),
+                  style: GoogleFonts.poppins(color: Colors.black),
                 ),
               ),
               const SizedBox(height: 20),
@@ -156,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     child: Text(
                       'Forgot Password?',
-                      style: GoogleFonts.roboto(color: Colors.white),
+                      style: GoogleFonts.poppins(color: Colors.white),
                     ),
                   ),
                 ),
@@ -180,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: Text('Login',
-                      style: GoogleFonts.roboto(color: Colors.white)),
+                      style: GoogleFonts.poppins(color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 20),
@@ -189,7 +189,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Text(
                     "Don't have an account?",
-                    style: GoogleFonts.roboto(color: Colors.white),
+                    style: GoogleFonts.poppins(color: Colors.white),
                   ),
                   TextButton(
                     onPressed: () {
@@ -200,7 +200,8 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     child: Text(
                       'Sign up',
-                      style: GoogleFonts.roboto(color: Colors.deepPurpleAccent),
+                      style:
+                          GoogleFonts.poppins(color: Colors.deepPurpleAccent),
                     ),
                   ),
                 ],

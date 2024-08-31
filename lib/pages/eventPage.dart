@@ -20,32 +20,38 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void _fetchEvents() async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('events')
-        .where('category', isEqualTo: 'Events')
-        .get();
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('events')
+          .where('category', isEqualTo: 'Events')
+          .get();
 
-    final events = snapshot.docs.map((doc) {
-      return {
-        'title': doc['title'],
-        'date': (doc['event_date'] as Timestamp).toDate(),
-        'time': doc['event_time'],
-        'location': doc['event_location'],
-        'description': doc['description'],
-        'image': doc['event_pic'],
-      };
-    }).toList();
+      final events = snapshot.docs.map((doc) {
+        return {
+          'title': doc['title'] ?? '',
+          'date': (doc['event_date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          'time': doc['event_time'] ?? '',
+          'location': doc['event_location'] ?? '',
+          'description': doc['description'] ?? '',
+          'image': doc['event_pic'] ?? '',
+        };
+      }).toList();
 
-    Map<DateTime, List<Map<String, dynamic>>> eventMap = {};
+      Map<DateTime, List<Map<String, dynamic>>> eventMap = {};
 
-    for (var event in events) {
-      DateTime eventDate = event['date'];
-      eventMap.putIfAbsent(eventDate, () => []).add(event);
+      for (var event in events) {
+        DateTime eventDate = event['date'];
+        eventMap.putIfAbsent(eventDate, () => []).add(event);
+      }
+
+      print("Fetched events: $eventMap"); // Debugging statement
+
+      setState(() {
+        _events = eventMap;
+      });
+    } catch (e) {
+      print('Error fetching events: $e');
     }
-
-    setState(() {
-      _events = eventMap;
-    });
   }
 
   @override
@@ -134,7 +140,8 @@ class _EventsPageState extends State<EventsPage> {
                   ),
                 ),
                 SizedBox(height: 16),
-                if (_events[_selectedDay] != null)
+                if (_events[_selectedDay] != null &&
+                    _events[_selectedDay]!.isNotEmpty)
                   ..._events[_selectedDay]!.map((event) {
                     return announcementCard(
                       title: event['title'],
@@ -144,7 +151,11 @@ class _EventsPageState extends State<EventsPage> {
                       description: event['description'],
                       imageUrl: event['image'],
                     );
-                  }).toList(),
+                  }).toList()
+                else
+                  Center(
+                      child: Text('No events for this day.',
+                          style: TextStyle(color: Colors.white))),
               ],
             ),
           ),
@@ -203,12 +214,13 @@ class _EventsPageState extends State<EventsPage> {
               ],
             ),
             SizedBox(height: 12),
-            Image.network(
-              imageUrl,
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            if (imageUrl.isNotEmpty)
+              Image.network(
+                imageUrl,
+                height: 150,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             SizedBox(height: 12),
             Row(
               children: [

@@ -58,14 +58,15 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               color: Color.fromARGB(255, 28, 25, 106),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // Center horizontally
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Center(
                       child: Text(
                         'Announcements',
-                        style: GoogleFonts.roboto(
+                        style: GoogleFonts.poppins(
                           textStyle: TextStyle(
                             color: Colors.white,
                             fontSize: 30,
@@ -90,62 +91,64 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: 20),
                   // Announcement Cards
-                  // StreamBuilder<QuerySnapshot>(
-                  //   stream: FirebaseFirestore.instance
-                  //       .collection('events')
-                  //       .where('category',
-                  //           isEqualTo: _categories[_selectedIndex])
-                  //       .snapshots(),
-                  //   builder: (context, snapshot) {
-                  //     if (snapshot.hasError) {
-                  //       return Center(
-                  //         child: Text(
-                  //           'Error: ${snapshot.error}',
-                  //           style: TextStyle(color: Colors.white),
-                  //         ),
-                  //       );
-                  //     }
-                  //     if (snapshot.connectionState == ConnectionState.waiting) {
-                  //       return Center(child: CircularProgressIndicator());
-                  //     }
+                  StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('events')
+                        .where('category',
+                            isEqualTo: _categories[_selectedIndex])
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text(
+                            'Error: ${snapshot.error}',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                  //     final events = snapshot.data?.docs ?? [];
+                      final events = snapshot.data?.docs ?? [];
 
-                  //     if (events.isEmpty) {
-                  //       return Container(
-                  //         color: Color.fromARGB(
-                  //             255, 28, 25, 106), // Retain background color
-                  //         height: MediaQuery.of(context).size.height *
-                  //             0.5, // Set a height to ensure the background color is visible
-                  //         child: Center(
-                  //           child: Text(
-                  //             'No data available',
-                  //             style: GoogleFonts.roboto(
-                  //               textStyle: TextStyle(
-                  //                 color: Colors.white,
-                  //                 fontSize: 18,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       );
-                  //     }
+                      if (events.isEmpty) {
+                        return Container(
+                          color: Color.fromARGB(
+                              255, 28, 25, 106), // Retain background color
+                          height: MediaQuery.of(context).size.height *
+                              0.5, // Set a height to ensure the background color is visible
+                          child: Center(
+                            child: Text(
+                              'No data available',
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
 
-                  //     return Container(
-                  //       color: Color.fromARGB(255, 28, 25,
-                  //           106), // Ensure background color remains consistent
-                  //       child: Column(
-                  //         children: events.map((doc) {
-                  //           return Padding(
-                  //             padding: const EdgeInsets.symmetric(
-                  //                 horizontal: 16.0, vertical: 8.0),
-                  //             child: announcementCard(doc),
-                  //           );
-                  //         }).toList(),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
+                      return Container(
+                        color: Color.fromARGB(255, 28, 25,
+                            106), // Ensure background color remains consistent
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.center, // Center horizontally
+                          children: events.map((doc) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                              child: announcementCard(doc),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -205,7 +208,7 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 8.0),
                     Text(
                       label,
-                      style: GoogleFonts.roboto(
+                      style: GoogleFonts.poppins(
                         textStyle: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -247,76 +250,63 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Helper widget to create the announcement card
   Widget announcementCard(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
+    // Formatting the date
+    DateTime eventDate = data['event_date']?.toDate() ?? DateTime.now();
+    String formattedDate = DateFormat('MMMM d, y').format(eventDate);
+    String eventTime = data['event_time'] ?? 'No Time';
+
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
+        borderRadius: BorderRadius.circular(15.0),
       ),
-      elevation: 8,
-      shadowColor: Colors.black.withOpacity(0.2),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Color(0xFFECECEC)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title
-              Text(
-                data['title'] ?? 'No Title',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF312E81),
-                  ),
-                ),
+      elevation: 5,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            // Logo Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                data['event_pic'] ??
+                    'images/placeholder.png', // Fetched event_pic or a placeholder
+                height: 80, // Adjust the size of the logo image
+                width: 80,
+                fit: BoxFit.cover,
               ),
-              SizedBox(height: 8),
-              // Description
-              Text(
-                data['description'] ?? 'No Description',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
+            ),
+            SizedBox(width: 16),
+            // Description and Date/Time
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data['title'] ?? 'No Title',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF312E81),
+                    ),
                   ),
-                ),
-              ),
-              SizedBox(height: 8),
-              // Date and Time
-              Text(
-                '${data['event_date']?.toDate()} at ${data['event_time'] ?? 'No Time'}',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                  SizedBox(height: 8),
+                  Text(
+                    data['description'] ?? 'No Description',
+                    style: TextStyle(fontSize: 14, color: Colors.black),
                   ),
-                ),
-              ),
-              SizedBox(height: 8),
-              // Location
-              Text(
-                data['event_location'] ?? 'No Location',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
+                  SizedBox(height: 8),
+                  Text(
+                    '$formattedDate, $eventTime',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
