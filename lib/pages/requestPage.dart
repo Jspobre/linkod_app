@@ -36,7 +36,7 @@ class RequestPage extends StatelessWidget {
             // Title Text
             Center(
               child: Text(
-                'Request/Report Status',
+                'Request Status',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,

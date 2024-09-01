@@ -165,6 +165,21 @@ class _SignupPageState extends State<SignupPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+
+      // Clear the form
+      _firstNameController.clear();
+      _middleNameController.clear();
+      _lastNameController.clear();
+      _birthdayController.clear();
+      _ageController.clear();
+      _contactNumberController.clear();
+      _emailController.clear();
+      _passwordController.clear();
+      _zoneController.clear();
+      _pickedProfileFile = null;
+      _pickedFile = null;
+      _selectedCivilStatus = null;
+      _selectedGender = null;
     } catch (e) {
       // Handle error
       print(e.toString());

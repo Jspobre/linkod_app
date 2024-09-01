@@ -256,7 +256,7 @@ class _HomePageState extends State<HomePage> {
     // Formatting the date
     DateTime eventDate = data['event_date']?.toDate() ?? DateTime.now();
     String formattedDate = DateFormat('MMMM d, y').format(eventDate);
-    String eventTime = data['event_time'] ?? 'No Time';
+    String eventTime = data['event_time'] ?? '';
 
     return Card(
       shape: RoundedRectangleBorder(

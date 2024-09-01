@@ -798,10 +798,12 @@ class _ChatBotState extends State<ChatBot> {
     String complainant,
   ) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+
     DateTime now = DateTime.now();
     String reportedDate = DateFormat('MMMM dd, yyyy').format(now);
     String reportedTime = DateFormat('hh:mm a').format(now);
-
+    String? uid = auth.currentUser?.uid;
     try {
       await firestore.collection('blotter_reports').add({
         'reported_date': reportedDate,
@@ -812,6 +814,7 @@ class _ChatBotState extends State<ChatBot> {
         'why': why,
         'how': how,
         'complainant': complainant,
+        'uid': uid,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
