@@ -291,6 +291,9 @@ class _ChatBotState extends State<ChatBot> {
     TextEditingController zoneController = TextEditingController();
     TextEditingController purposeController = TextEditingController();
 
+    // Controller for gender dropdown
+    String? selectedGender;
+
     return _buildChatBubble([
       Text(
         'Please provide the following information for barangay clearance:',
@@ -302,6 +305,14 @@ class _ChatBotState extends State<ChatBot> {
       const SizedBox(height: 10),
       _buildTextField('Age', ageController),
       const SizedBox(height: 10),
+      _buildDropdownField(
+        // 'Gender',
+        ['Male', 'Female', 'Other'],
+        (value) {
+          selectedGender = value;
+        },
+      ),
+      const SizedBox(height: 10),
       _buildTextField('Civil Status', civilStatusController),
       const SizedBox(height: 10),
       _buildTextField('Zone', zoneController),
@@ -310,17 +321,31 @@ class _ChatBotState extends State<ChatBot> {
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
+          if (selectedGender == null) {
+            Fluttertoast.showToast(
+              msg: "Please select a gender",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+            return;
+          }
+
           _submitBarangayClearanceForm(
             nameController.text.trim(),
             ageController.text.trim(),
+            selectedGender!,
             civilStatusController.text.trim(),
             zoneController.text.trim(),
             purposeController.text.trim(),
           );
 
-          // Clear the text fields after submission
+          // Clear the text fields and reset dropdown after submission
           nameController.clear();
           ageController.clear();
+          selectedGender = null;
           civilStatusController.clear();
           zoneController.clear();
           purposeController.clear();
@@ -339,9 +364,47 @@ class _ChatBotState extends State<ChatBot> {
     ]);
   }
 
+  Widget _buildDropdownField(
+    // String label,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Text(
+        //   label,
+        //   style: TextStyle(
+        //     fontSize: 16,
+        //     fontWeight: FontWeight.w600,
+        //   ),
+        // ),
+        SizedBox(height: 5),
+        DropdownButtonFormField<String>(
+          isExpanded: true,
+          hint: Text('Select Gender'),
+          items: items.map((String item) {
+            return DropdownMenuItem<String>(
+              value: item,
+              child: Text(item),
+            );
+          }).toList(),
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          ),
+        ),
+      ],
+    );
+  }
+
   void _submitBarangayClearanceForm(
     String fullName,
     String age,
+    String gender,
     String civilStatus,
     String zone,
     String purpose,
@@ -362,6 +425,7 @@ class _ChatBotState extends State<ChatBot> {
         'uid': uid, // Add UID to the Firestore document
         'details': {
           'age': age,
+          'gender': gender,
           'civil_status': civilStatus,
           'zone': zone,
           'purpose': purpose,

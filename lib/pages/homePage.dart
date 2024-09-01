@@ -91,64 +91,64 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: 20),
                   // Announcement Cards
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('events')
-                        .where('category',
-                            isEqualTo: _categories[_selectedIndex])
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(
-                          child: Text(
-                            'Error: ${snapshot.error}',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+                  // StreamBuilder<QuerySnapshot>(
+                  //   stream: FirebaseFirestore.instance
+                  //       .collection('events')
+                  //       .where('category',
+                  //           isEqualTo: _categories[_selectedIndex])
+                  //       .snapshots(),
+                  //   builder: (context, snapshot) {
+                  //     if (snapshot.hasError) {
+                  //       return Center(
+                  //         child: Text(
+                  //           'Error: ${snapshot.error}',
+                  //           style: TextStyle(color: Colors.white),
+                  //         ),
+                  //       );
+                  //     }
+                  //     if (snapshot.connectionState == ConnectionState.waiting) {
+                  //       return Center(child: CircularProgressIndicator());
+                  //     }
 
-                      final events = snapshot.data?.docs ?? [];
+                  //     final events = snapshot.data?.docs ?? [];
 
-                      if (events.isEmpty) {
-                        return Container(
-                          color: Color.fromARGB(
-                              255, 28, 25, 106), // Retain background color
-                          height: MediaQuery.of(context).size.height *
-                              0.5, // Set a height to ensure the background color is visible
-                          child: Center(
-                            child: Text(
-                              'No data available',
-                              style: GoogleFonts.poppins(
-                                textStyle: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
+                  //     if (events.isEmpty) {
+                  //       return Container(
+                  //         color: Color.fromARGB(
+                  //             255, 28, 25, 106), // Retain background color
+                  //         height: MediaQuery.of(context).size.height *
+                  //             0.5, // Set a height to ensure the background color is visible
+                  //         child: Center(
+                  //           child: Text(
+                  //             'No data available',
+                  //             style: GoogleFonts.poppins(
+                  //               textStyle: TextStyle(
+                  //                 color: Colors.white,
+                  //                 fontSize: 18,
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       );
+                  //     }
 
-                      return Container(
-                        color: Color.fromARGB(255, 28, 25,
-                            106), // Ensure background color remains consistent
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.center, // Center horizontally
-                          children: events.map((doc) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
-                              child: announcementCard(doc),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    },
-                  ),
+                  //     return Container(
+                  //       color: Color.fromARGB(255, 28, 25,
+                  //           106), // Ensure background color remains consistent
+                  //       child: Column(
+                  //         crossAxisAlignment:
+                  //             CrossAxisAlignment.center, // Center horizontally
+                  //         children: events.map((doc) {
+                  //           return Padding(
+                  //             padding: const EdgeInsets.symmetric(
+                  //                 horizontal: 16.0, vertical: 8.0),
+                  //             child: announcementCard(doc),
+                  //           );
+                  //         }).toList(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
             ),

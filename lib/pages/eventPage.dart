@@ -40,9 +40,17 @@ class _EventsPageState extends State<EventsPage> {
       Map<DateTime, List<Map<String, dynamic>>> eventMap = {};
 
       for (var event in events) {
-        DateTime eventDate = event['date'];
+        DateTime eventDate = DateTime.utc(
+            (event['date'] as DateTime).year,
+            (event['date'] as DateTime).month,
+            (event['date'] as DateTime).day,
+            (event['date'] as DateTime).hour,
+            (event['date'] as DateTime).minute);
+        print(eventDate);
         eventMap.putIfAbsent(eventDate, () => []).add(event);
+        // eventMap.putIfAbsent(eventDate, () => []).add(event);
       }
+      print(eventMap);
 
       print("Fetched events: $eventMap"); // Debugging statement
 
@@ -115,6 +123,9 @@ class _EventsPageState extends State<EventsPage> {
                       color: Colors.deepOrange,
                       shape: BoxShape.circle,
                     ),
+                    markerDecoration: BoxDecoration(
+                        color: Color.fromARGB(255, 255, 0, 0),
+                        shape: BoxShape.circle),
                     selectedDecoration: BoxDecoration(
                       color: Colors.blueAccent,
                       shape: BoxShape.circle,

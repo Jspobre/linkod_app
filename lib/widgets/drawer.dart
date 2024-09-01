@@ -4,10 +4,11 @@ import 'package:linkod_app/pages/loginPage.dart'; // Update with your login page
 import '../pages/homePage.dart';
 import '../pages/profilePage.dart';
 import '../pages/eventPage.dart';
-import '../pages/requestReportPage.dart';
+import '../pages/requestPage.dart';
 import '../pages/settingsPage.dart';
 import '../pages/electricBillPage.dart';
-import '../pages/testPage.dart';
+// import '../pages/testPage.dart';
+import '../pages/reportPage.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -62,8 +63,9 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.report, color: Colors.black, size: 30.0),
-            title: Text('Report/Request Status'),
+            leading: Icon(Icons.request_page_rounded,
+                color: Colors.black, size: 30.0),
+            title: Text('Request Status'),
             onTap: () {
               Navigator.push(
                 context,
@@ -73,6 +75,16 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.report, color: Colors.black, size: 30.0),
+            title: Text('Report Status'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ReportPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.electric_bolt, color: Colors.black, size: 30.0),
             title: Text('Electric Bill Notice'),
             onTap: () {
               Navigator.push(
@@ -91,16 +103,16 @@ class AppDrawer extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            leading: Icon(Icons.settings, color: Colors.black, size: 30.0),
-            title: Text('Test'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SignupPageTest()),
-              );
-            },
-          ),
+          // ListTile(
+          //   leading: Icon(Icons.settings, color: Colors.black, size: 30.0),
+          //   title: Text('Test'),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => SignupPageTest()),
+          //     );
+          //   },
+          // ),
           ListTile(
             leading: Icon(Icons.logout, color: Colors.black, size: 30.0),
             title: Text('Logout'),

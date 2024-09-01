@@ -70,13 +70,16 @@ class _SignupPageState extends State<SignupPage> {
 
   String? _fileName;
   String? _fileProfileName;
+  PlatformFile? _pickedFile;
+  PlatformFile? _pickedProfileFile;
 
   Future<void> _pickFile() async {
     final result = await FilePicker.platform.pickFiles();
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
-        _fileName = result.files.single.name;
+        _pickedFile = result.files.single;
+        _fileName = _pickedFile!.name;
       });
     }
   }
@@ -86,16 +89,17 @@ class _SignupPageState extends State<SignupPage> {
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
-        _fileProfileName = result.files.single.name;
+        _pickedProfileFile = result.files.single;
+        _fileProfileName = _pickedProfileFile!.name;
       });
     }
   }
 
-  Future<String?> _uploadFile(File file, String folder) async {
+  Future<String?> _uploadFile(PlatformFile pickedFile, String folder) async {
     try {
-      final fileName = file.path.split('/').last;
-      final ref = FirebaseStorage.instance.ref().child('$folder/$fileName');
-      final uploadTask = ref.putFile(file);
+      final ref =
+          FirebaseStorage.instance.ref().child('$folder/${pickedFile.name}');
+      final uploadTask = ref.putFile(File(pickedFile.path!));
 
       final snapshot = await uploadTask.whenComplete(() => {});
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -119,14 +123,12 @@ class _SignupPageState extends State<SignupPage> {
       String? profilePicUrl;
       String? validIdUrl;
 
-      if (_fileProfileName != null) {
-        final profilePicFile = File(_fileProfileName!);
-        profilePicUrl = await _uploadFile(profilePicFile, 'profile_pic');
+      if (_pickedProfileFile != null) {
+        profilePicUrl = await _uploadFile(_pickedProfileFile!, 'profile_pic');
       }
 
-      if (_fileName != null) {
-        final validIdFile = File(_fileName!);
-        validIdUrl = await _uploadFile(validIdFile, 'valid_id');
+      if (_pickedFile != null) {
+        validIdUrl = await _uploadFile(_pickedFile!, 'valid_id');
       }
 
       // Add user details to Firestore

@@ -36,16 +36,16 @@ class _ProfilePageState extends State<ProfilePage> {
           firstNameController.text = userData['first_name'] ?? '';
           middleNameController.text = userData['middle_name'] ?? '';
           lastNameController.text = userData['last_name'] ?? '';
-
+          birthdayController.text = userData['birthday'] ?? '';
           // Handle timestamp for birthday
-          Timestamp? birthdayTimestamp = userData['birthday'];
-          birthdayController.text = birthdayTimestamp != null
-              ? birthdayTimestamp
-                  .toDate()
-                  .toLocal()
-                  .toString()
-                  .split(' ')[0] // Format to YYYY-MM-DD
-              : '';
+          // Timestamp? birthdayTimestamp = userData['birthday'];
+          // birthdayController.text = birthdayTimestamp != null
+          //     ? birthdayTimestamp
+          //         .toDate()
+          //         .toLocal()
+          //         .toString()
+          //         .split(' ')[0] // Format to YYYY-MM-DD
+          //     : '';
 
           civilStatusController.text = userData['civil_status'] ?? '';
           zoneController.text = userData['zone'] ?? '';
