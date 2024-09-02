@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import './signupPage.dart';
 import './homePage.dart';
 import './forgotPassword.dart';
+import 'package:fluttertoast/fluttertoast.dart'; // Import fluttertoast
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -17,20 +19,53 @@ class _LoginPageState extends State<LoginPage> {
 
   // Future<void> _signIn() async {
   //   try {
-  //     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-  //       email: _emailController.text.trim(),
-  //       password: _passwordController.text.trim(),
-  //     );
-  //     print('Signed in: ${userCredential.user!.uid}');
-  //     Navigator.push(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => HomePage()),
-  //     );
+  //     // Get the user's email from the input field
+  //     String email = _emailController.text.trim();
+
+  //     // Query Firestore to check the user's status
+  //     DocumentSnapshot userDoc = await FirebaseFirestore.instance
+  //         .collection('users') // Replace 'users' with your collection name
+  //         .doc(email)
+  //         .get();
+
+  //     if (userDoc.exists) {
+  //       // Check if the status is 'approved'
+  //       String status = userDoc.get('status');
+  //       if (status == 'approved') {
+  //         // Status is approved, proceed with sign-in
+  //         UserCredential userCredential =
+  //             await _auth.signInWithEmailAndPassword(
+  //           email: email,
+  //           password: _passwordController.text.trim(),
+  //         );
+  //         print('Signed in: ${userCredential.user!.uid}');
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => HomePage()),
+  //         );
+  //       } else {
+  //         // Status is not approved, show an error message using Flutter toast
+  //         Fluttertoast.showToast(
+  //           msg: 'Your account has not been approved yet.',
+  //           toastLength: Toast.LENGTH_LONG,
+  //           gravity: ToastGravity.BOTTOM,
+  //         );
+  //       }
+  //     } else {
+  //       // User document does not exist, show an error message using Flutter toast
+  //       Fluttertoast.showToast(
+  //         msg: 'No account found with this email.',
+  //         toastLength: Toast.LENGTH_LONG,
+  //         gravity: ToastGravity.BOTTOM,
+  //       );
+  //     }
   //   } catch (e) {
   //     print('Error: $e');
-  //     // Optionally show an error message to the user
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Failed to sign in: $e')),
+  //     // Show a general error message using Flutter toast
+  //     Fluttertoast.showToast(
+  //       msg: 'Failed to sign in: $e',
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.BOTTOM,
   //     );
   //   }
   // }

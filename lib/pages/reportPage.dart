@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore package
 import 'package:intl/intl.dart'; // Import intl package for date formatting
 import '../widgets/drawer.dart';
 
-class ReportPage extends StatelessWidget {
+class ReportPage extends StatefulWidget {
+  @override
+  _ReportPageState createState() => _ReportPageState();
+}
+
+class _ReportPageState extends State<ReportPage> {
+  // Firestore reference
+  final CollectionReference blotterReportsCollection =
+      FirebaseFirestore.instance.collection('blotter_reports');
+
   @override
   Widget build(BuildContext context) {
-    // Get the current user's UID
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 28, 25, 106), // Background color
@@ -45,176 +50,204 @@ class ReportPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-            // StreamBuilder to fetch and display request details
+            // Fetch and display Firestore data
             Expanded(
-              // Use Expanded to make the ListView take the remaining space
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collection('blotter_reports')
-                    .where('uid', isEqualTo: uid) // Filter by UID
-                    .snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              child: StreamBuilder<QuerySnapshot>(
+                stream: blotterReportsCollection.snapshots(),
+                builder: (context, snapshot) {
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(child: Text('No reports found.'));
+                    return Center(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
                   }
 
-                  // Display each request in a ListView.builder
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    );
+                  }
+
+                  final reports = snapshot.data?.docs ?? [];
+
+                  if (reports.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No reports found.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+
                   return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
+                    itemCount: reports.length,
                     itemBuilder: (context, index) {
-                      var document = snapshot.data!.docs[index];
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        elevation: 8,
-                        shadowColor: Colors.black.withOpacity(0.3),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF4C51BF), Color(0xFF6B46C1)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
+                      var reportData =
+                          reports[index].data() as Map<String, dynamic>;
+
+                      var report = {
+                        'complainant': reportData['complainant'] ?? 'Unknown',
+                        'what': reportData['what'] ?? 'Unknown',
+                        'where': reportData['where'] ?? 'Unknown',
+                        'when': reportData['when'] ?? 'Unknown',
+                        'why': reportData['why'] ?? 'Unknown',
+                        'how': reportData['how'] ?? 'Unknown',
+                        'status': reportData['status'] ?? 'Unknown',
+                        'reported_date':
+                            reportData['reported_date'] ?? 'Unknown',
+                        'reported_time':
+                            reportData['reported_time'] ?? 'Unknown',
+                        'timestamp':
+                            (reportData['timestamp'] as Timestamp?)?.toDate() ??
+                                DateTime.now(),
+                        'isExpanded': false, // State for expansion
+                      };
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            report['isExpanded'] = !report['isExpanded'];
+                          });
+                        },
+                        child: Card(
+                          shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.0),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              children: [
-                                // Custom Icon (can replace with a logo or another icon)
-                                Container(
-                                  padding: EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.description,
-                                    color: Color(0xFF312E81),
-                                    size: 30,
-                                  ),
-                                ),
-                                SizedBox(width: 16),
-                                // Report Details
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                          elevation: 8,
+                          shadowColor: Colors.black.withOpacity(0.3),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFF4C51BF), Color(0xFF6B46C1)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        'Blotter Report',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Complainant: ${document['complainant'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'What: ${document['what'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Where: ${document['where'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'When: ${document['when'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Why: ${document['why'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'How: ${document['how'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Row(
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Status:',
+                                            report['complainant'],
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            report['what'],
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 color: Colors.white70),
                                           ),
-                                          SizedBox(width: 8),
-                                          Icon(
-                                            document['status'] == 'Pending'
-                                                ? Icons.pending
-                                                : Icons.check_circle,
-                                            color:
-                                                document['status'] == 'Pending'
-                                                    ? Colors.orange
-                                                    : Colors.green,
-                                            size: 20,
-                                          ),
-                                          SizedBox(width: 8),
+                                          SizedBox(height: 8),
                                           Text(
-                                            document['status'] ?? 'Unknown',
+                                            'Reported: ${report['reported_date']}',
                                             style: TextStyle(
                                                 fontSize: 14,
-                                                color: document['status'] ==
+                                                color: Colors.white70),
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Icon(
+                                            report['status'] == 'Pending'
+                                                ? Icons.pending
+                                                : Icons.check_circle,
+                                            color: report['status'] == 'Pending'
+                                                ? Colors.orange
+                                                : Colors.green,
+                                            size: 24,
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            report['status'],
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: report['status'] ==
                                                         'Pending'
                                                     ? Colors.orange
                                                     : Colors.green),
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Reported Date: ${document['reported_date'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Reported Time: ${document['reported_time'] ?? 'Unknown'}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Timestamp: ${_formatDate(document['timestamp'])}',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white70),
-                                      ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  // Expanded section
+                                  if (report['isExpanded'])
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Divider(
+                                          color: Colors.white38,
+                                          thickness: 1,
+                                          height: 20,
+                                        ),
+                                        Text(
+                                          'Where: ${report['where']}',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'When: ${report['when']}',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Why: ${report['why']}',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'How: ${report['how']}',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Reported Time: ${report['reported_time']}',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70),
+                                        ),
+                                        SizedBox(height: 8),
+                                        Text(
+                                          'Timestamp: ${_formatDate(report['timestamp'])}',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -230,10 +263,10 @@ class ReportPage extends StatelessWidget {
     );
   }
 
-  // Helper function to format the date from a Timestamp
-  String _formatDate(Timestamp? timestamp) {
-    if (timestamp == null) return 'Unknown';
-    DateTime date = timestamp.toDate();
-    return DateFormat('MMMM d, yyyy').format(date); // e.g., "August 22, 2024"
+  // Helper function to format the date
+  String _formatDate(DateTime? dateTime) {
+    if (dateTime == null) return 'Unknown';
+    return DateFormat('MMMM d, yyyy')
+        .format(dateTime); // e.g., "August 22, 2024"
   }
 }

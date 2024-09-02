@@ -123,7 +123,6 @@ class RequestPage extends StatelessWidget {
                                             fontSize: 14,
                                             color: Colors.white70),
                                       ),
-                                      SizedBox(height: 8),
                                       Row(
                                         children: [
                                           Text(
@@ -134,13 +133,14 @@ class RequestPage extends StatelessWidget {
                                           ),
                                           SizedBox(width: 8),
                                           Icon(
-                                            document['status'] == 'Pending'
+                                            document['status'] ==
+                                                    'pending' // Updated to lowercase 'pending'
                                                 ? Icons.pending
                                                 : Icons.check_circle,
-                                            color:
-                                                document['status'] == 'Pending'
-                                                    ? Colors.orange
-                                                    : Colors.green,
+                                            color: document['status'] ==
+                                                    'pending' // Updated to lowercase 'pending'
+                                                ? Colors.orange
+                                                : Colors.green,
                                             size: 20,
                                           ),
                                           SizedBox(width: 8),
@@ -149,7 +149,7 @@ class RequestPage extends StatelessWidget {
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 color: document['status'] ==
-                                                        'Pending'
+                                                        'pending' // Updated to lowercase 'pending'
                                                     ? Colors.orange
                                                     : Colors.green),
                                           ),

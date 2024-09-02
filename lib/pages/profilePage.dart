@@ -17,6 +17,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController zoneController = TextEditingController();
   final TextEditingController contactNumberController = TextEditingController();
 
+  String? profilePicUrl;
+
   @override
   void initState() {
     super.initState();
@@ -37,19 +39,10 @@ class _ProfilePageState extends State<ProfilePage> {
           middleNameController.text = userData['middle_name'] ?? '';
           lastNameController.text = userData['last_name'] ?? '';
           birthdayController.text = userData['birthday'] ?? '';
-          // Handle timestamp for birthday
-          // Timestamp? birthdayTimestamp = userData['birthday'];
-          // birthdayController.text = birthdayTimestamp != null
-          //     ? birthdayTimestamp
-          //         .toDate()
-          //         .toLocal()
-          //         .toString()
-          //         .split(' ')[0] // Format to YYYY-MM-DD
-          //     : '';
-
           civilStatusController.text = userData['civil_status'] ?? '';
           zoneController.text = userData['zone'] ?? '';
           contactNumberController.text = userData['contact_number'] ?? '';
+          profilePicUrl = userData['profile_pic'] ?? '';
         });
       }
     }
@@ -81,9 +74,15 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                'images/lingkod_logo.png', // Path to your logo
-                height: 100, // Adjust the size of the logo
+              SizedBox(height: 20),
+              CircleAvatar(
+                radius: 70,
+                backgroundImage:
+                    profilePicUrl != null && profilePicUrl!.isNotEmpty
+                        ? NetworkImage(profilePicUrl!)
+                        : AssetImage('images/lingkod_logo.png')
+                            as ImageProvider, // Default to lingkod_logo.png
+                backgroundColor: Colors.white.withOpacity(0.1),
               ),
               SizedBox(height: 20),
               Text(
@@ -129,7 +128,6 @@ class _ProfilePageState extends State<ProfilePage> {
         keyboardType: labelText == 'Birthday'
             ? TextInputType.datetime
             : TextInputType.text,
-        // Add a tap event to show a date picker for the Birthday field
         onTap: labelText == 'Birthday'
             ? () async {
                 FocusScope.of(context)

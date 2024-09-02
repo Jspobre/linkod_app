@@ -431,7 +431,7 @@ class _SignupPageState extends State<SignupPage> {
                   // const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 40.0, right: 40.0, bottom: 20.0),
+                        left: 80.0, right: 80.0, bottom: 20.0),
                     child: ElevatedButton(
                       onPressed: _pickFile,
                       style: ElevatedButton.styleFrom(
@@ -452,21 +452,26 @@ class _SignupPageState extends State<SignupPage> {
                             color: Colors.grey,
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            _fileName == null
-                                ? 'Upload Valid ID'
-                                : 'File: $_fileName',
-                            style: const TextStyle(
-                                color: Color.fromARGB(255, 99, 92, 92)),
+                          Flexible(
+                            child: Text(
+                              _fileName == null
+                                  ? 'Upload Valid ID'
+                                  : 'File: $_fileName',
+                              style: const TextStyle(
+                                  color: Color.fromARGB(255, 99, 92, 92)),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
+
                   // const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 40.0, right: 40.0, bottom: 20.0),
+                        left: 80.0, right: 80.0, bottom: 20.0),
                     child: ElevatedButton(
                       onPressed: _pickProfileFile,
                       style: ElevatedButton.styleFrom(
@@ -487,12 +492,16 @@ class _SignupPageState extends State<SignupPage> {
                             color: Colors.grey,
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            _fileProfileName == null
-                                ? 'Upload Profile Picture'
-                                : 'File: $_fileProfileName',
-                            style: const TextStyle(
-                                color: Color.fromARGB(255, 99, 92, 92)),
+                          Flexible(
+                            child: Text(
+                              _fileProfileName == null
+                                  ? 'Upload Profile Picture'
+                                  : 'File: $_fileProfileName',
+                              style: const TextStyle(
+                                  color: Color.fromARGB(255, 99, 92, 92)),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                         ],
                       ),
