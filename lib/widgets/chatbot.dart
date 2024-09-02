@@ -609,11 +609,13 @@ class _ChatBotState extends State<ChatBot> {
     TextEditingController controller, {
     void Function()? onTap,
     bool readOnly = false,
+    void Function(String)? onChanged,
   }) {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
+      onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(
@@ -630,42 +632,114 @@ class _ChatBotState extends State<ChatBot> {
     TextEditingController numOfMembersController = TextEditingController();
     TextEditingController contactNumberController = TextEditingController();
 
-    return _buildChatBubble([
-      Text(
-        'Please provide the following information for Household Registration:',
-        style: TextStyle(
-            color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 10),
-      _buildTextField('Household Head', householdHeadController),
-      const SizedBox(height: 10),
-      _buildTextField('Address', addressController),
-      const SizedBox(height: 10),
-      _buildTextField('Number of Members', numOfMembersController),
-      const SizedBox(height: 10),
-      _buildTextField('Contact Number', contactNumberController),
-      SizedBox(height: 10),
-      ElevatedButton(
-        onPressed: () {
-          _submitHouseholdRegistrationForm(
-            householdHeadController.text.trim(),
-            addressController.text.trim(),
-            numOfMembersController.text.trim(),
-            contactNumberController.text.trim(),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.deepPurple,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    List<Map<String, String>> members = [];
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return _buildChatBubble([
+          Text(
+            'Please provide the following information for Household Registration:',
+            style: TextStyle(
+                color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
           ),
-        ),
-        child: Text(
-          'Submit',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    ]);
+          SizedBox(height: 10),
+          _buildTextField('Household Head', householdHeadController),
+          const SizedBox(height: 10),
+          _buildTextField('Address', addressController),
+          const SizedBox(height: 10),
+          _buildTextField('Number of Members', numOfMembersController),
+          const SizedBox(height: 10),
+          ...members
+              .asMap()
+              .entries
+              .map(
+                (entry) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Member ${entry.key + 1}',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    _buildTextField(
+                      'Member Name',
+                      TextEditingController(
+                        text: entry.value['name'],
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          members[entry.key]['name'] = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(
+                      'Member Age',
+                      TextEditingController(
+                        text: entry.value['age'],
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          members[entry.key]['age'] = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                ),
+              )
+              .toList(),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                members.add({'name': '', 'age': ''});
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Add Member',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              _submitHouseholdRegistrationForm(
+                householdHeadController.text.trim(),
+                addressController.text.trim(),
+                numOfMembersController.text.trim(),
+                contactNumberController.text.trim(),
+                members,
+              );
+
+              // Clear the form fields
+              householdHeadController.clear();
+              addressController.clear();
+              numOfMembersController.clear();
+              contactNumberController.clear();
+              members.clear();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Submit',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ]);
+      },
+    );
   }
 
   void _submitHouseholdRegistrationForm(
@@ -673,8 +747,10 @@ class _ChatBotState extends State<ChatBot> {
     String address,
     String numOfMembers,
     String contactNumber,
+    List<Map<String, String>> members,
   ) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
+    User? user = FirebaseAuth.instance.currentUser; // Get the current user
 
     try {
       await firestore.collection('household_registrations').add({
@@ -682,8 +758,20 @@ class _ChatBotState extends State<ChatBot> {
         'address': address,
         'number_of_members': numOfMembers,
         'contact_number': contactNumber,
+        'members': members,
+        'user_uid': user?.uid, // Include UID
         'timestamp': FieldValue.serverTimestamp(),
       });
+
+      // Show success toast
+      Fluttertoast.showToast(
+        msg: "Your Household Registration has been submitted successfully!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
 
       _addChatMessage(_buildChatBubble([
         Text(
@@ -696,6 +784,16 @@ class _ChatBotState extends State<ChatBot> {
         ),
       ]));
     } catch (e) {
+      // Show error toast
+      Fluttertoast.showToast(
+        msg: "Failed to submit your registration. Please try again later.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+
       _addChatMessage(_buildChatBubble([
         Text(
           'Failed to submit your registration. Please try again later.',
