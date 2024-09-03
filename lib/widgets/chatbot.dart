@@ -69,7 +69,7 @@ class _ChatBotState extends State<ChatBot> {
     } else if (option == 'Business Permit') {
       _addChatMessage(_buildBusinessPermitForm());
     } else if (option == 'Certificate of Indigency') {
-      _addChatMessage(_buildHouseholdRegistrationForm());
+      _addChatMessage(_buildBarangayIndigencyForm());
     } else if (option == 'Event Permit') {
       _addChatMessage(_buildHouseholdRegistrationForm());
     } else if (option == 'Household Registration') {
@@ -105,7 +105,7 @@ class _ChatBotState extends State<ChatBot> {
         _addChatMessage(_buildBusinessPermitForm());
       } else if (userMessage.toLowerCase() == 'certificate of indigency') {
         // Handle Household Registration options
-        _addChatMessage(_buildHouseholdRegistrationForm());
+        _addChatMessage(_buildBarangayIndigencyForm());
       } else if (userMessage.toLowerCase() == 'event permit') {
         // Handle Household Registration options
         _addChatMessage(_buildHouseholdRegistrationForm());
@@ -293,6 +293,7 @@ class _ChatBotState extends State<ChatBot> {
 
     // Controller for gender dropdown
     String? selectedGender;
+    String? selectedCivilStatus;
 
     return _buildChatBubble([
       Text(
@@ -306,14 +307,27 @@ class _ChatBotState extends State<ChatBot> {
       _buildTextField('Age', ageController),
       const SizedBox(height: 10),
       _buildDropdownField(
-        // 'Gender',
-        ['Male', 'Female', 'Other'],
-        (value) {
+        hintText: 'Select Gender',
+        items: ['Male', 'Female', 'Other'],
+        onChanged: (value) {
           selectedGender = value;
         },
       ),
       const SizedBox(height: 10),
-      _buildTextField('Civil Status', civilStatusController),
+      _buildDropdownField(
+        hintText: 'Select Civil Status',
+        items: [
+          'Single',
+          'Married',
+          'Divorced',
+          'Widowed',
+          'Separated',
+          'Annulled'
+        ],
+        onChanged: (value) {
+          selectedCivilStatus = value;
+        },
+      ),
       const SizedBox(height: 10),
       _buildTextField('Zone', zoneController),
       const SizedBox(height: 10),
@@ -337,7 +351,8 @@ class _ChatBotState extends State<ChatBot> {
             nameController.text.trim(),
             ageController.text.trim(),
             selectedGender!,
-            civilStatusController.text.trim(),
+            // civilStatusController.text.trim(),
+            selectedCivilStatus!,
             zoneController.text.trim(),
             purposeController.text.trim(),
           );
@@ -346,7 +361,7 @@ class _ChatBotState extends State<ChatBot> {
           nameController.clear();
           ageController.clear();
           selectedGender = null;
-          civilStatusController.clear();
+          selectedCivilStatus = null;
           zoneController.clear();
           purposeController.clear();
         },
@@ -364,25 +379,20 @@ class _ChatBotState extends State<ChatBot> {
     ]);
   }
 
-  Widget _buildDropdownField(
-    // String label,
-    List<String> items,
-    ValueChanged<String?> onChanged,
-  ) {
+  Widget _buildDropdownField({
+    required String hintText,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+    String? selectedItem,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Text(
-        //   label,
-        //   style: TextStyle(
-        //     fontSize: 16,
-        //     fontWeight: FontWeight.w600,
-        //   ),
-        // ),
         SizedBox(height: 5),
         DropdownButtonFormField<String>(
           isExpanded: true,
-          hint: Text('Select Gender'),
+          value: selectedItem,
+          hint: Text(hintText),
           items: items.map((String item) {
             return DropdownMenuItem<String>(
               value: item,
@@ -623,6 +633,118 @@ class _ChatBotState extends State<ChatBot> {
         ),
       ),
     );
+  }
+
+  Widget _buildBarangayIndigencyForm() {
+    TextEditingController fullNameController = TextEditingController();
+    TextEditingController ageController = TextEditingController();
+    TextEditingController citizenshipController = TextEditingController();
+    TextEditingController civilStatusController = TextEditingController();
+    TextEditingController genderController = TextEditingController();
+    TextEditingController purposeController = TextEditingController();
+
+    return _buildChatBubble([
+      Text(
+        'Please provide the following information for the barangay indigency:',
+        style: TextStyle(
+            color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10),
+      _buildTextField('Full Name', fullNameController),
+      const SizedBox(height: 10),
+      _buildTextField('Age', ageController),
+      const SizedBox(height: 10),
+      _buildTextField('Citizenship', citizenshipController),
+      const SizedBox(height: 10),
+      _buildTextField('Civil Status', civilStatusController),
+      const SizedBox(height: 10),
+      _buildTextField('Gender', genderController),
+      const SizedBox(height: 10),
+      _buildTextField('Purpose', purposeController),
+      SizedBox(height: 10),
+      ElevatedButton(
+        onPressed: () {
+          _submitBarangayIndigencyForm(
+            fullNameController.text.trim(),
+            int.tryParse(ageController.text.trim()) ?? 0,
+            citizenshipController.text.trim(),
+            civilStatusController.text.trim(),
+            genderController.text.trim(),
+            purposeController.text.trim(),
+          );
+
+          // Clear the text fields after submission
+          fullNameController.clear();
+          ageController.clear();
+          citizenshipController.clear();
+          civilStatusController.clear();
+          genderController.clear();
+          purposeController.clear();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Text(
+          'Submit',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    ]);
+  }
+
+  void _submitBarangayIndigencyForm(
+    String fullName,
+    int age,
+    String citizenship,
+    String civilStatus,
+    String gender,
+    String purpose,
+  ) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    try {
+      // Get the current user's UID
+      String? uid = auth.currentUser?.uid;
+
+      await firestore.collection('requests').add({
+        'full_name': fullName,
+        'status': 'pending',
+        'type': 'Barangay Indigency',
+        'date_requested': FieldValue.serverTimestamp(),
+        'uid': uid, // Add UID to the Firestore document
+        'details': {
+          'age': age,
+          'citizenship': citizenship,
+          'civil_status': civilStatus,
+          'gender': gender,
+          'purpose': purpose,
+        },
+      });
+
+      // Show confirmation toast message
+      Fluttertoast.showToast(
+        msg: "Your Barangay Indigency request has been submitted successfully!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      // Handle error and show error toast message
+      Fluttertoast.showToast(
+        msg: "Failed to submit your request. Please try again later.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
 
   // Household registration form
