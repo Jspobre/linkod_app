@@ -14,6 +14,7 @@ class _ChatBotState extends State<ChatBot> {
   bool _isChatOpen = false;
   List<Widget> _chatMessages = [];
   TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   void _addChatMessage(Widget message) {
     setState(() {
@@ -340,7 +341,7 @@ class _ChatBotState extends State<ChatBot> {
               msg: "Please select a gender",
               toastLength: Toast.LENGTH_LONG,
               gravity: ToastGravity.BOTTOM,
-              backgroundColor: Colors.red,
+              backgroundColor: const Color.fromARGB(255, 162, 51, 43),
               textColor: Colors.white,
               fontSize: 16.0,
             );
@@ -640,8 +641,9 @@ class _ChatBotState extends State<ChatBot> {
     TextEditingController ageController = TextEditingController();
     TextEditingController citizenshipController = TextEditingController();
     TextEditingController civilStatusController = TextEditingController();
-    TextEditingController genderController = TextEditingController();
     TextEditingController purposeController = TextEditingController();
+    String? selectedGender2;
+    String? selectedCivilStatus2;
 
     return _buildChatBubble([
       Text(
@@ -656,9 +658,28 @@ class _ChatBotState extends State<ChatBot> {
       const SizedBox(height: 10),
       _buildTextField('Citizenship', citizenshipController),
       const SizedBox(height: 10),
-      _buildTextField('Civil Status', civilStatusController),
+      _buildDropdownField(
+        hintText: 'Select Civil Status',
+        items: [
+          'Single',
+          'Married',
+          'Divorced',
+          'Widowed',
+          'Separated',
+          'Annulled'
+        ],
+        onChanged: (value) {
+          selectedCivilStatus2 = value;
+        },
+      ),
       const SizedBox(height: 10),
-      _buildTextField('Gender', genderController),
+      _buildDropdownField(
+        hintText: 'Select Gender',
+        items: ['Male', 'Female', 'Other'],
+        onChanged: (value) {
+          selectedGender2 = value;
+        },
+      ),
       const SizedBox(height: 10),
       _buildTextField('Purpose', purposeController),
       SizedBox(height: 10),
@@ -668,18 +689,22 @@ class _ChatBotState extends State<ChatBot> {
             fullNameController.text.trim(),
             int.tryParse(ageController.text.trim()) ?? 0,
             citizenshipController.text.trim(),
-            civilStatusController.text.trim(),
-            genderController.text.trim(),
+            selectedCivilStatus2 ??
+                '', // Use selectedGender2 instead of genderController
+            selectedGender2 ??
+                '', // Use selectedGender2 instead of genderController
             purposeController.text.trim(),
           );
 
           // Clear the text fields after submission
-          fullNameController.clear();
-          ageController.clear();
-          citizenshipController.clear();
-          civilStatusController.clear();
-          genderController.clear();
-          purposeController.clear();
+          setState(() {
+            fullNameController.clear();
+            ageController.clear();
+            citizenshipController.clear();
+            selectedCivilStatus2 = null;
+            purposeController.clear();
+            selectedGender2 = null; // Reset gender selection
+          });
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.deepPurple,
@@ -747,6 +772,160 @@ class _ChatBotState extends State<ChatBot> {
     }
   }
 
+  Widget _buildEventPermitForm() {
+    TextEditingController fullNameController = TextEditingController();
+    TextEditingController ageController = TextEditingController();
+    TextEditingController citizenshipController = TextEditingController();
+    TextEditingController eventNameController = TextEditingController();
+    TextEditingController eventPlaceController = TextEditingController();
+    TextEditingController eventTimeController = TextEditingController();
+    TextEditingController guestNoController = TextEditingController();
+    String? selectedGender2;
+    String? selectedCivilStatus2;
+
+    return _buildChatBubble([
+      Text(
+        'Please provide the following information for the event permit:',
+        style: TextStyle(
+            color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10),
+      _buildTextField('Full Name', fullNameController),
+      const SizedBox(height: 10),
+      _buildTextField('Age', ageController),
+      const SizedBox(height: 10),
+      _buildTextField('Citizenship', citizenshipController),
+      const SizedBox(height: 10),
+      _buildDropdownField(
+        hintText: 'Select Civil Status',
+        items: [
+          'Single',
+          'Married',
+          'Divorced',
+          'Widowed',
+          'Separated',
+          'Annulled'
+        ],
+        onChanged: (value) {
+          selectedCivilStatus2 = value;
+        },
+      ),
+      const SizedBox(height: 10),
+      _buildDropdownField(
+        hintText: 'Select Gender',
+        items: ['Male', 'Female', 'Other'],
+        onChanged: (value) {
+          selectedGender2 = value;
+        },
+      ),
+      const SizedBox(height: 10),
+      _buildTextField('Event Name', eventNameController),
+      const SizedBox(height: 10),
+      _buildTextField('Event Place', eventPlaceController),
+      const SizedBox(height: 10),
+      _buildTextField('Event Time', eventTimeController),
+      const SizedBox(height: 10),
+      _buildTextField('Number of Guests', guestNoController),
+      const SizedBox(height: 10),
+      ElevatedButton(
+        onPressed: () {
+          _submitEventPermitForm(
+            fullNameController.text.trim(),
+            int.tryParse(ageController.text.trim()) ?? 0,
+            citizenshipController.text.trim(),
+            selectedCivilStatus2 ?? '',
+            selectedGender2 ?? '',
+            eventNameController.text.trim(),
+            eventPlaceController.text.trim(),
+            eventTimeController.text.trim(),
+            int.tryParse(guestNoController.text.trim()) ?? 0,
+          );
+
+          // Clear the text fields after submission
+          setState(() {
+            fullNameController.clear();
+            ageController.clear();
+            citizenshipController.clear();
+            selectedCivilStatus2 = null;
+            selectedGender2 = null;
+            eventNameController.clear();
+            eventPlaceController.clear();
+            eventTimeController.clear();
+            guestNoController.clear();
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.deepPurple,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Text(
+          'Submit',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    ]);
+  }
+
+  void _submitEventPermitForm(
+    String fullName,
+    int age,
+    String citizenship,
+    String civilStatus,
+    String gender,
+    String eventName,
+    String eventPlace,
+    String eventTime,
+    int guestNo,
+  ) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    try {
+      // Get the current user's UID
+      String? uid = auth.currentUser?.uid;
+
+      await firestore.collection('requests').add({
+        'full_name': fullName,
+        'status': 'pending',
+        'type': 'Event Permit',
+        'date_requested': FieldValue.serverTimestamp(),
+        'uid': uid, // Add UID to the Firestore document
+        'details': {
+          'age': age,
+          'citizenship': citizenship,
+          'civil_status': civilStatus,
+          'gender': gender,
+          'event_name': eventName,
+          'event_place': eventPlace,
+          'event_time': eventTime,
+          'guest_no': guestNo,
+        },
+      });
+
+      // Show confirmation toast message
+      Fluttertoast.showToast(
+        msg: "Your Event Permit request has been submitted successfully!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      // Handle error and show error toast message
+      Fluttertoast.showToast(
+        msg: "Failed to submit your request. Please try again later.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
+
   // Household registration form
   Widget _buildHouseholdRegistrationForm() {
     TextEditingController householdHeadController = TextEditingController();
@@ -754,7 +933,7 @@ class _ChatBotState extends State<ChatBot> {
     TextEditingController numOfMembersController = TextEditingController();
     TextEditingController contactNumberController = TextEditingController();
 
-    List<Map<String, String>> members = [];
+    List<Map<String, TextEditingController>> membersControllers = [];
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -764,14 +943,14 @@ class _ChatBotState extends State<ChatBot> {
             style: TextStyle(
                 color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           _buildTextField('Household Head', householdHeadController),
           const SizedBox(height: 10),
           _buildTextField('Address', addressController),
           const SizedBox(height: 10),
           _buildTextField('Number of Members', numOfMembersController),
           const SizedBox(height: 10),
-          ...members
+          ...membersControllers
               .asMap()
               .entries
               .map(
@@ -787,26 +966,12 @@ class _ChatBotState extends State<ChatBot> {
                     ),
                     _buildTextField(
                       'Member Name',
-                      TextEditingController(
-                        text: entry.value['name'],
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          members[entry.key]['name'] = value;
-                        });
-                      },
+                      entry.value['name']!,
                     ),
                     const SizedBox(height: 10),
                     _buildTextField(
                       'Member Age',
-                      TextEditingController(
-                        text: entry.value['age'],
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          members[entry.key]['age'] = value;
-                        });
-                      },
+                      entry.value['age']!,
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -816,7 +981,10 @@ class _ChatBotState extends State<ChatBot> {
           ElevatedButton(
             onPressed: () {
               setState(() {
-                members.add({'name': '', 'age': ''});
+                membersControllers.add({
+                  'name': TextEditingController(),
+                  'age': TextEditingController(),
+                });
               });
             },
             style: ElevatedButton.styleFrom(
@@ -833,6 +1001,14 @@ class _ChatBotState extends State<ChatBot> {
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
+              List<Map<String, String>> members =
+                  membersControllers.map((controllerMap) {
+                return {
+                  'name': controllerMap['name']!.text.trim(),
+                  'age': controllerMap['age']!.text.trim(),
+                };
+              }).toList();
+
               _submitHouseholdRegistrationForm(
                 householdHeadController.text.trim(),
                 addressController.text.trim(),
@@ -846,7 +1022,7 @@ class _ChatBotState extends State<ChatBot> {
               addressController.clear();
               numOfMembersController.clear();
               contactNumberController.clear();
-              members.clear();
+              membersControllers.clear();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
@@ -895,16 +1071,16 @@ class _ChatBotState extends State<ChatBot> {
         fontSize: 16.0,
       );
 
-      _addChatMessage(_buildChatBubble([
-        Text(
-          'Your Household Registration has been submitted successfully!',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ]));
+      // _addChatMessage(_buildChatBubble([
+      //   Text(
+      //     'Your Household Registration has been submitted successfully!',
+      //     style: TextStyle(
+      //       color: Colors.black,
+      //       fontSize: 15,
+      //       fontWeight: FontWeight.bold,
+      //     ),
+      //   ),
+      // ]));
     } catch (e) {
       // Show error toast
       Fluttertoast.showToast(

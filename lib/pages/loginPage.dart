@@ -16,65 +16,65 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<void> _signIn() async {
-    try {
-      // Get the user's email and password from the input fields
-      String email = _emailController.text.trim();
-      String password = _passwordController.text.trim();
+  // Future<void> _signIn() async {
+  //   try {
+  //     // Get the user's email and password from the input fields
+  //     String email = _emailController.text.trim();
+  //     String password = _passwordController.text.trim();
 
-      // Query Firestore to find the document with the matching email field
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('users') // Replace 'users' with your collection name
-          .where('email', isEqualTo: email)
-          .limit(1) // Limit to 1 result since email should be unique
-          .get();
+  //     // Query Firestore to find the document with the matching email field
+  //     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+  //         .collection('users') // Replace 'users' with your collection name
+  //         .where('email', isEqualTo: email)
+  //         .limit(1) // Limit to 1 result since email should be unique
+  //         .get();
 
-      if (querySnapshot.docs.isNotEmpty) {
-        // Get the first document (should be the only one if emails are unique)
-        DocumentSnapshot userDoc = querySnapshot.docs.first;
+  //     if (querySnapshot.docs.isNotEmpty) {
+  //       // Get the first document (should be the only one if emails are unique)
+  //       DocumentSnapshot userDoc = querySnapshot.docs.first;
 
-        // Check if the status field is 'approved'
-        String status = userDoc.get('status');
-        if (status == 'approved') {
-          // Status is approved, proceed with sign-in
-          UserCredential userCredential =
-              await _auth.signInWithEmailAndPassword(
-            email: email,
-            password: password,
-          );
-          print('Signed in: ${userCredential.user!.uid}');
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        } else {
-          // Status is not approved, show an error message using Flutter toast
-          Fluttertoast.showToast(
-            msg: 'Your account has not been approved yet.',
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.BOTTOM,
-          );
-        }
-      } else {
-        // User document does not exist, show an error message using Flutter toast
-        Fluttertoast.showToast(
-          msg: 'No account found with this email.',
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-        );
-      }
-    } catch (e) {
-      print('Error: $e');
-      // Show a general error message using Flutter toast
-      Fluttertoast.showToast(
-        msg: 'Failed to sign in: $e',
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-      );
-    }
-  }
+  //       // Check if the status field is 'approved'
+  //       String status = userDoc.get('status');
+  //       if (status == 'approved') {
+  //         // Status is approved, proceed with sign-in
+  //         UserCredential userCredential =
+  //             await _auth.signInWithEmailAndPassword(
+  //           email: email,
+  //           password: password,
+  //         );
+  //         print('Signed in: ${userCredential.user!.uid}');
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(builder: (context) => HomePage()),
+  //         );
+  //       } else {
+  //         // Status is not approved, show an error message using Flutter toast
+  //         Fluttertoast.showToast(
+  //           msg: 'Your account has not been approved yet.',
+  //           toastLength: Toast.LENGTH_LONG,
+  //           gravity: ToastGravity.BOTTOM,
+  //         );
+  //       }
+  //     } else {
+  //       // User document does not exist, show an error message using Flutter toast
+  //       Fluttertoast.showToast(
+  //         msg: 'No account found with this email.',
+  //         toastLength: Toast.LENGTH_LONG,
+  //         gravity: ToastGravity.BOTTOM,
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print('Error: $e');
+  //     // Show a general error message using Flutter toast
+  //     Fluttertoast.showToast(
+  //       msg: 'Failed to sign in: $e',
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.BOTTOM,
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
