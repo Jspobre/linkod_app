@@ -13,6 +13,9 @@ class _ReportPageState extends State<ReportPage> {
   final CollectionReference blotterReportsCollection =
       FirebaseFirestore.instance.collection('blotter_reports');
 
+  // Map to keep track of expanded states
+  Map<String, bool> expandedStates = {};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,6 +91,7 @@ class _ReportPageState extends State<ReportPage> {
                     itemBuilder: (context, index) {
                       var reportData =
                           reports[index].data() as Map<String, dynamic>;
+                      var reportId = reports[index].id;
 
                       var report = {
                         'complainant': reportData['complainant'] ?? 'Unknown',
@@ -104,13 +108,16 @@ class _ReportPageState extends State<ReportPage> {
                         'timestamp':
                             (reportData['timestamp'] as Timestamp?)?.toDate() ??
                                 DateTime.now(),
-                        'isExpanded': false, // State for expansion
+                        'isExpanded': expandedStates[reportId] ??
+                            false, // Get the expansion state from the map
                       };
 
                       return GestureDetector(
                         onTap: () {
                           setState(() {
                             report['isExpanded'] = !report['isExpanded'];
+                            expandedStates[reportId] =
+                                report['isExpanded']; // Store the state
                           });
                         },
                         child: Card(
@@ -170,10 +177,10 @@ class _ReportPageState extends State<ReportPage> {
                                             CrossAxisAlignment.end,
                                         children: [
                                           Icon(
-                                            report['status'] == 'Pending'
+                                            report['status'] == 'pending'
                                                 ? Icons.pending
                                                 : Icons.check_circle,
-                                            color: report['status'] == 'Pending'
+                                            color: report['status'] == 'pending'
                                                 ? Colors.orange
                                                 : Colors.green,
                                             size: 24,
@@ -184,7 +191,26 @@ class _ReportPageState extends State<ReportPage> {
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 color: report['status'] ==
-                                                        'Pending'
+                                                        'pending'
+                                                    ? Colors.orange
+                                                    : Colors.green),
+                                          ),
+                                          Icon(
+                                            report['status'] == 'ongoing'
+                                                ? Icons.pending
+                                                : Icons.check_circle,
+                                            color: report['status'] == 'ongoing'
+                                                ? Colors.orange
+                                                : Colors.green,
+                                            size: 24,
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            report['status'],
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: report['status'] ==
+                                                        'ongoing'
                                                     ? Colors.orange
                                                     : Colors.green),
                                           ),

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import './pages/loginPage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -12,7 +13,7 @@ void main() async {
   // await Firebase.initializeApp();
 
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('app_icon'); // The converted icon file
+      AndroidInitializationSettings('linkod'); // The converted icon file
 
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,

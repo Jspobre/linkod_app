@@ -948,6 +948,8 @@ class _ChatBotState extends State<ChatBot> {
           const SizedBox(height: 10),
           _buildTextField('Address', addressController),
           const SizedBox(height: 10),
+          _buildTextField('Contact Number', contactNumberController),
+          const SizedBox(height: 10),
           _buildTextField('Number of Members', numOfMembersController),
           const SizedBox(height: 10),
           ...membersControllers
@@ -1017,12 +1019,22 @@ class _ChatBotState extends State<ChatBot> {
                 members,
               );
 
+              void _clearMembersControllers() {
+                for (var controllerMap in membersControllers) {
+                  // Dispose of each TextEditingController
+                  controllerMap['name']?.clear();
+                  controllerMap['age']?.clear();
+                }
+                // // Clear the list after disposing of the controllers
+                // membersControllers.clear();
+              }
+
               // Clear the form fields
               householdHeadController.clear();
               addressController.clear();
               numOfMembersController.clear();
               contactNumberController.clear();
-              membersControllers.clear();
+              _clearMembersControllers();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,

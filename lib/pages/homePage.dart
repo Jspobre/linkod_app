@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../widgets/drawer.dart';
 import '../widgets/chatbot.dart';
 import 'package:intl/intl.dart';
+import '../widgets/notification.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -39,16 +40,17 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.notifications,
-              color: Colors.white,
-              size: 30.0,
-            ),
-            onPressed: () {
-              // Handle notification icon tap
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(
+          //     Icons.notifications,
+          //     color: Colors.white,
+          //     size: 30.0,
+          //   ),
+          //   onPressed: () {
+          //     _showNotificationWindow(context);
+          //   },
+          // ),
+          NotificationWidget()
         ],
       ),
       drawer: AppDrawer(),
