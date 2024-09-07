@@ -5,38 +5,36 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   NotificationService() {
-    final initializationSettingsAndroid =
-        AndroidInitializationSettings('linkod'); // replace with your icon
-    // final initializationSettingsIOS = IOSInitializationSettings();
-    final initializationSettings = InitializationSettings(
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('linkod');
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
       android: initializationSettingsAndroid,
-      // iOS: initializationSettingsIOS,
     );
 
     _flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
   Future<void> showNotification(String title, String body) async {
-    const androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
       '1',
       'linkod',
-      channelDescription: 'test',
       importance: Importance.max,
       priority: Priority.high,
-      ticker: 'ticker',
+      showWhen: false,
     );
-    // const iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    const platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      // iOS: iOSPlatformChannelSpecifics,
+
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
     );
 
     await _flutterLocalNotificationsPlugin.show(
-      0, // Notification ID
+      0,
       title,
       body,
-      platformChannelSpecifics,
-      payload: 'item x',
+      notificationDetails,
     );
   }
 }

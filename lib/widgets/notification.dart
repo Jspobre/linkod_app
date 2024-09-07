@@ -10,14 +10,14 @@ class NotificationWidget extends StatefulWidget {
 
 class _NotificationWidgetState extends State<NotificationWidget> {
   int _unreadCount = 0;
-  final NotificationService _notificationService =
-      NotificationService(); // Initialize notification service
+  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
     super.initState();
     _fetchUnreadCount();
     _listenForNewNotifications();
+    _checkReminders();
   }
 
   void _fetchUnreadCount() async {
@@ -59,9 +59,42 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         .collection('notifications')
         .doc(notificationId)
         .update({'is_read': true});
-
-    // Optionally, fetch unread count again to update the badge
     _fetchUnreadCount();
+  }
+
+  void _checkReminders() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final now = DateTime.now();
+    final reminderSnapshot = await FirebaseFirestore.instance
+        .collection('reminders')
+        .where('user_id', isEqualTo: userId)
+        .where('date', isGreaterThanOrEqualTo: now)
+        .get();
+
+    for (var doc in reminderSnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final title = data['title'] ?? 'No title';
+      final date = (data['date'] as Timestamp).toDate();
+
+      if (date.isBefore(now.add(Duration(days: 1)))) {
+        // Send local notification
+        _notificationService.showNotification(
+          'Reminder: $title',
+          'You have an upcoming event tomorrow!',
+        );
+
+        // Insert into notifications collection
+        await FirebaseFirestore.instance.collection('notifications').add({
+          'receiver_uid': userId,
+          'notif_msg': 'Reminder: $title - You have an event tomorrow!',
+          'type': 'reminder',
+          'timestamp': Timestamp.now(),
+          'is_read': false,
+        });
+      }
+    }
   }
 
   @override

@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/drawer.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
-// import 'package:timezone/data/latest_utc.dart' as tz;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class EventsPage extends StatefulWidget {
   @override
@@ -164,6 +165,9 @@ class _EventsPageState extends State<EventsPage> {
                       location: event['location'],
                       description: event['description'],
                       imageUrl: event['image'],
+                      onRemindMeClicked: () {
+                        _addReminder(event['title'], event['date']);
+                      },
                     );
                   }).toList()
                 else
@@ -185,6 +189,7 @@ class _EventsPageState extends State<EventsPage> {
     required String location,
     required String description,
     required String imageUrl,
+    required VoidCallback onRemindMeClicked, // Add this parameter
   }) {
     return Card(
       shape: RoundedRectangleBorder(
@@ -209,10 +214,14 @@ class _EventsPageState extends State<EventsPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    setState(() {
-                      _selectedDay = date;
-                      _focusedDay = date;
-                    });
+                    onRemindMeClicked(); // Call the callback function
+                    Fluttertoast.showToast(
+                      msg: "Reminder set for $title",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple, // Background color
@@ -300,6 +309,34 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
     );
+  }
+
+  void _addReminder(String title, DateTime date) async {
+    try {
+      final userId =
+          FirebaseAuth.instance.currentUser?.uid; // Get the current user's ID
+      await FirebaseFirestore.instance.collection('reminders').add({
+        'title': title,
+        'date': date,
+        'user_id': userId,
+        'is_read': false,
+      });
+      Fluttertoast.showToast(
+        msg: "Reminder added for $title",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Error adding reminder: $e",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
   }
 
   String _formatDate(DateTime date) {
