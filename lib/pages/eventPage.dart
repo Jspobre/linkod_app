@@ -128,10 +128,9 @@ class _EventsPageState extends State<EventsPage> {
                       shape: BoxShape.circle,
                     ),
                     markerDecoration: BoxDecoration(
-                        color: Color.fromARGB(255, 255, 0, 0),
-                        shape: BoxShape.circle),
+                        color: Colors.blueAccent, shape: BoxShape.circle),
                     selectedDecoration: BoxDecoration(
-                      color: Colors.blueAccent,
+                      color: Colors.redAccent,
                       shape: BoxShape.circle,
                     ),
                     defaultTextStyle: TextStyle(color: Colors.white),
@@ -189,7 +188,7 @@ class _EventsPageState extends State<EventsPage> {
     required String location,
     required String description,
     required String imageUrl,
-    required VoidCallback onRemindMeClicked, // Add this parameter
+    required VoidCallback onRemindMeClicked,
   }) {
     return Card(
       shape: RoundedRectangleBorder(
@@ -204,17 +203,22 @@ class _EventsPageState extends State<EventsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF312E81),
+                Flexible(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF312E81),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
+                SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () {
-                    onRemindMeClicked(); // Call the callback function
+                    onRemindMeClicked();
                     Fluttertoast.showToast(
                       msg: "Reminder set for $title",
                       toastLength: Toast.LENGTH_SHORT,
@@ -224,7 +228,7 @@ class _EventsPageState extends State<EventsPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple, // Background color
+                    backgroundColor: Colors.deepPurple,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -250,7 +254,7 @@ class _EventsPageState extends State<EventsPage> {
                 Icon(Icons.calendar_today, color: Colors.deepPurple, size: 20),
                 SizedBox(width: 8),
                 Text(
-                  '${_formatDate(date)}',
+                  _formatDate(date),
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.black,
@@ -293,6 +297,8 @@ class _EventsPageState extends State<EventsPage> {
                 fontSize: 14,
                 color: Colors.black,
               ),
+              overflow: TextOverflow.ellipsis, // Prevent overflow
+              maxLines: 3, // Limit to 3 lines
             ),
             SizedBox(height: 12),
             Align(

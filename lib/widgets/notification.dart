@@ -86,13 +86,13 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         );
 
         // Insert into notifications collection
-        await FirebaseFirestore.instance.collection('notifications').add({
-          'receiver_uid': userId,
-          'notif_msg': 'Reminder: $title - You have an event tomorrow!',
-          'type': 'reminder',
-          'timestamp': Timestamp.now(),
-          'is_read': false,
-        });
+        // await FirebaseFirestore.instance.collection('notifications').add({
+        //   'receiver_uid': userId,
+        //   'notif_msg': 'Reminder: $title - You have an event tomorrow!',
+        //   'type': 'reminder',
+        //   'timestamp': Timestamp.now(),
+        //   'is_read': false,
+        // });
       }
     }
   }
@@ -158,7 +158,10 @@ class _NotificationWidgetState extends State<NotificationWidget> {
             ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.deepPurpleAccent, Colors.purple],
+                colors: [
+                  const Color.fromARGB(255, 255, 255, 255),
+                  Color.fromARGB(255, 234, 234, 235)
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -172,7 +175,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
-                    color: Colors.white,
+                    color: const Color.fromARGB(255, 0, 0, 0),
                   ),
                 ),
                 SizedBox(height: 10),
@@ -228,10 +231,10 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                                 notification['notif_msg'] ?? 'No message',
                                 style: TextStyle(color: Colors.white),
                               ),
-                              subtitle: Text(
-                                notification['type'] ?? 'No type',
-                                style: TextStyle(color: Colors.grey[200]),
-                              ),
+                              // subtitle: Text(
+                              //   notification['type'] ?? 'No type',
+                              //   style: TextStyle(color: Colors.grey[200]),
+                              // ),
                               onTap: () {
                                 _markAsRead(notificationId);
                                 Navigator.of(context)

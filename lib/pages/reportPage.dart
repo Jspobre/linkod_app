@@ -177,42 +177,25 @@ class _ReportPageState extends State<ReportPage> {
                                             CrossAxisAlignment.end,
                                         children: [
                                           Icon(
-                                            report['status'] == 'pending'
-                                                ? Icons.pending
-                                                : Icons.check_circle,
-                                            color: report['status'] == 'pending'
-                                                ? Colors.orange
-                                                : Colors.green,
+                                            report['status'] == 'resolved'
+                                                ? Icons.check_circle
+                                                : Icons.pending,
+                                            color:
+                                                report['status'] == 'resolved'
+                                                    ? Colors.green
+                                                    : Colors.orange,
                                             size: 24,
                                           ),
                                           SizedBox(height: 8),
                                           Text(
                                             report['status'],
                                             style: TextStyle(
-                                                fontSize: 14,
-                                                color: report['status'] ==
-                                                        'pending'
-                                                    ? Colors.orange
-                                                    : Colors.green),
-                                          ),
-                                          Icon(
-                                            report['status'] == 'ongoing'
-                                                ? Icons.pending
-                                                : Icons.check_circle,
-                                            color: report['status'] == 'ongoing'
-                                                ? Colors.orange
-                                                : Colors.green,
-                                            size: 24,
-                                          ),
-                                          SizedBox(height: 8),
-                                          Text(
-                                            report['status'],
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: report['status'] ==
-                                                        'ongoing'
-                                                    ? Colors.orange
-                                                    : Colors.green),
+                                              fontSize: 14,
+                                              color:
+                                                  report['status'] == 'resolved'
+                                                      ? Colors.green
+                                                      : Colors.orange,
+                                            ),
                                           ),
                                         ],
                                       ),

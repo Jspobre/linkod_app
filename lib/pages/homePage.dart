@@ -260,6 +260,13 @@ class _HomePageState extends State<HomePage> {
     String formattedDate = DateFormat('MMMM d, y').format(eventDate);
     String eventTime = data['event_time'] ?? '';
 
+    // Limiting the description length
+    String description = data['description'] ?? 'No Description';
+    const int descriptionMaxLength = 100; // Adjust the max length as needed
+    if (description.length > descriptionMaxLength) {
+      description = description.substring(0, descriptionMaxLength) + '...';
+    }
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0),
@@ -296,7 +303,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    data['description'] ?? 'No Description',
+                    description,
                     style: TextStyle(fontSize: 14, color: Colors.black),
                   ),
                   SizedBox(height: 8),
