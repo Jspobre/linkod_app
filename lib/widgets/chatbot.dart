@@ -109,7 +109,8 @@ class _ChatBotState extends State<ChatBot> {
         _addChatMessage(_buildBarangayIndigencyForm());
       } else if (userMessage.toLowerCase() == 'event permit') {
         // Handle Household Registration options
-        _addChatMessage(_buildHouseholdRegistrationForm());
+        // _addChatMessage(_buildHouseholdRegistrationForm());
+        // TODO EVENT PERMIT
       }
     }
   }
@@ -444,6 +445,26 @@ class _ChatBotState extends State<ChatBot> {
         },
       });
 
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
+
+      if (result.docs.length > 0) {
+        result.docs.forEach((doc) async {
+          final notifRef =
+              FirebaseFirestore.instance.collection('notifications');
+
+          await notifRef.add({
+            'is_read': false,
+            'notif_msg': '${fullName} has requested Brgy Clearance.',
+            'receiver_uid': doc.id,
+            'timestamp': FieldValue.serverTimestamp(),
+            'type': 'request',
+          });
+        });
+      }
+
       // Show confirmation toast message
       Fluttertoast.showToast(
         msg: "Your Barangay Clearance request has been submitted successfully!",
@@ -592,6 +613,26 @@ class _ChatBotState extends State<ChatBot> {
               Timestamp.fromDate(validUntilDate), // Adjusted for Firestore
         },
       });
+
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
+
+      if (result.docs.length > 0) {
+        result.docs.forEach((doc) async {
+          final notifRef =
+              FirebaseFirestore.instance.collection('notifications');
+
+          await notifRef.add({
+            'is_read': false,
+            'notif_msg': '${proprietor} has requested Business Permit.',
+            'receiver_uid': doc.id,
+            'timestamp': FieldValue.serverTimestamp(),
+            'type': 'request',
+          });
+        });
+      }
 
       // Show confirmation toast message
       Fluttertoast.showToast(
@@ -749,6 +790,26 @@ class _ChatBotState extends State<ChatBot> {
           'purpose': purpose,
         },
       });
+
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
+
+      if (result.docs.length > 0) {
+        result.docs.forEach((doc) async {
+          final notifRef =
+              FirebaseFirestore.instance.collection('notifications');
+
+          await notifRef.add({
+            'is_read': false,
+            'notif_msg': '${fullName} has requested Brgy Indigency.',
+            'receiver_uid': doc.id,
+            'timestamp': FieldValue.serverTimestamp(),
+            'type': 'request',
+          });
+        });
+      }
 
       // Show confirmation toast message
       Fluttertoast.showToast(
@@ -1073,6 +1134,26 @@ class _ChatBotState extends State<ChatBot> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
+
+      if (result.docs.length > 0) {
+        result.docs.forEach((doc) async {
+          final notifRef =
+              FirebaseFirestore.instance.collection('notifications');
+
+          await notifRef.add({
+            'is_read': false,
+            'notif_msg': '${householdHead} has registered their household.',
+            'receiver_uid': doc.id,
+            'timestamp': FieldValue.serverTimestamp(),
+            'type': 'request',
+          });
+        });
+      }
+
       // Show success toast
       Fluttertoast.showToast(
         msg: "Your Household Registration has been submitted successfully!",
@@ -1225,6 +1306,26 @@ class _ChatBotState extends State<ChatBot> {
         'uid': uid,
         'timestamp': FieldValue.serverTimestamp(),
       });
+
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
+
+      if (result.docs.length > 0) {
+        result.docs.forEach((doc) async {
+          final notifRef =
+              FirebaseFirestore.instance.collection('notifications');
+
+          await notifRef.add({
+            'is_read': false,
+            'notif_msg': '${complainant} has submitted a blotter report.',
+            'receiver_uid': doc.id,
+            'timestamp': FieldValue.serverTimestamp(),
+            'type': 'request',
+          });
+        });
+      }
 
       _addChatMessage(_buildChatBubble([
         Text(
