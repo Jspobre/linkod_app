@@ -72,7 +72,7 @@ class _ChatBotState extends State<ChatBot> {
     } else if (option == 'Certificate of Indigency') {
       _addChatMessage(_buildBarangayIndigencyForm());
     } else if (option == 'Event Permit') {
-      _addChatMessage(_buildHouseholdRegistrationForm());
+      _addChatMessage(_buildEventPermitForm());
     } else if (option == 'Household Registration') {
       _addChatMessage(_buildHouseholdRegistrationForm());
     } else if (option == 'Submit Blotter Report') {
@@ -109,8 +109,7 @@ class _ChatBotState extends State<ChatBot> {
         _addChatMessage(_buildBarangayIndigencyForm());
       } else if (userMessage.toLowerCase() == 'event permit') {
         // Handle Household Registration options
-        // _addChatMessage(_buildHouseholdRegistrationForm());
-        // TODO EVENT PERMIT
+        _addChatMessage(_buildEventPermitForm());
       }
     }
   }
