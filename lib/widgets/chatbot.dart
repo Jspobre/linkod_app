@@ -20,6 +20,13 @@ class _ChatBotState extends State<ChatBot> {
     setState(() {
       _chatMessages.add(message);
     });
+
+    Future.delayed(
+      Duration(seconds: 1),
+      () {
+        _scrollToBottom();
+      },
+    );
   }
 
   void _showBarangayDocOptions() {
@@ -188,6 +195,14 @@ class _ChatBotState extends State<ChatBot> {
     );
   }
 
+  void _scrollToBottom() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -240,6 +255,7 @@ class _ChatBotState extends State<ChatBot> {
                     SizedBox(height: 10),
                     Expanded(
                       child: ListView(
+                        controller: _scrollController,
                         children: [
                           _buildChatBubble(
                             [
@@ -336,15 +352,19 @@ class _ChatBotState extends State<ChatBot> {
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
-          if (selectedGender == null) {
-            Fluttertoast.showToast(
-              msg: "Please select a gender",
-              toastLength: Toast.LENGTH_LONG,
-              gravity: ToastGravity.BOTTOM,
-              backgroundColor: const Color.fromARGB(255, 162, 51, 43),
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
+          if (selectedGender == null ||
+              nameController.text.isEmpty ||
+              ageController.text.isEmpty ||
+              zoneController.text.isEmpty ||
+              purposeController.text.isEmpty) {
+            // Fluttertoast.showToast(
+            //   msg: "Please select a gender",
+            //   toastLength: Toast.LENGTH_LONG,
+            //   gravity: ToastGravity.BOTTOM,
+            //   backgroundColor: const Color.fromARGB(255, 162, 51, 43),
+            //   textColor: Colors.white,
+            //   fontSize: 16.0,
+            // );
             return;
           }
 
@@ -357,6 +377,11 @@ class _ChatBotState extends State<ChatBot> {
             zoneController.text.trim(),
             purposeController.text.trim(),
           );
+
+          _addChatMessage(_buildChatBubble([
+            Text(
+                "Thank you. Your request for a barangay clearance has been submitted. You will receive a confirmation once it's ready for pickup.")
+          ]));
 
           // Clear the text fields and reset dropdown after submission
           nameController.clear();
@@ -539,6 +564,16 @@ class _ChatBotState extends State<ChatBot> {
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
+          if (nameController.text.isEmpty ||
+              addressController.text.isEmpty ||
+              businessStatusController.text.isEmpty ||
+              natureOfBusinessController.text.isEmpty ||
+              businessLocationController.text.isEmpty ||
+              permitNoController.text.isEmpty ||
+              amountPaidController.text.isEmpty ||
+              validUntilController.text.isEmpty) {
+            return;
+          }
           _submitBusinessPermitForm(
             nameController.text.trim(),
             addressController.text.trim(),
@@ -549,6 +584,11 @@ class _ChatBotState extends State<ChatBot> {
             double.tryParse(amountPaidController.text.trim()) ?? 0.0,
             validUntilController.text.trim(),
           );
+
+          _addChatMessage(_buildChatBubble([
+            Text(
+                "Thank you. Your request for a business permit has been submitted. You will receive a confirmation once it's ready for pickup.")
+          ]));
 
           // Clear the text fields after submission
           nameController.clear();
@@ -596,12 +636,12 @@ class _ChatBotState extends State<ChatBot> {
 
       await firestore.collection('requests').add({
         'full_name': proprietor,
-        'address': address,
         'status': 'pending',
         'type': 'Business Permit',
         'date_requested': FieldValue.serverTimestamp(),
         'uid': uid, // Add UID to the Firestore document
         'details': {
+          'address': address,
           'business_location': businessLocation,
           'nature_of_business': natureOfBusiness,
           'permit_no': permitNo,
@@ -725,6 +765,14 @@ class _ChatBotState extends State<ChatBot> {
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
+          if (fullNameController.text.isEmpty ||
+              ageController.text.isEmpty ||
+              citizenshipController.text.isEmpty ||
+              selectedCivilStatus2 == null ||
+              selectedGender2 == null ||
+              purposeController.text.isEmpty) {
+            return;
+          }
           _submitBarangayIndigencyForm(
             fullNameController.text.trim(),
             int.tryParse(ageController.text.trim()) ?? 0,
@@ -735,6 +783,11 @@ class _ChatBotState extends State<ChatBot> {
                 '', // Use selectedGender2 instead of genderController
             purposeController.text.trim(),
           );
+
+          _addChatMessage(_buildChatBubble([
+            Text(
+                "Thank you. Your request for a barangay indigigency has been submitted. You will receive a confirmation once it's ready for pickup.")
+          ]));
 
           // Clear the text fields after submission
           setState(() {
@@ -843,6 +896,9 @@ class _ChatBotState extends State<ChatBot> {
     String? selectedGender2;
     String? selectedCivilStatus2;
 
+    final TextEditingController eventDateController = TextEditingController();
+    DateTime? selectedDate;
+
     return _buildChatBubble([
       Text(
         'Please provide the following information for the event permit:',
@@ -885,23 +941,61 @@ class _ChatBotState extends State<ChatBot> {
       const SizedBox(height: 10),
       _buildTextField('Event Time', eventTimeController),
       const SizedBox(height: 10),
+      _buildTextField(
+        'Event Date',
+        eventDateController,
+        readOnly: true,
+        onTap: () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(1900),
+            lastDate: DateTime(2101),
+          );
+
+          if (pickedDate != null) {
+            String formattedDate =
+                DateFormat('MMMM dd, yyyy').format(pickedDate);
+            eventDateController.text = formattedDate;
+            selectedDate = pickedDate;
+          }
+        },
+      ),
+      const SizedBox(height: 10),
       _buildTextField('Number of Guests', guestNoController),
       const SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
+          if (fullNameController.text.isEmpty ||
+              ageController.text.isEmpty ||
+              citizenshipController.text.isEmpty ||
+              selectedCivilStatus2 == null ||
+              selectedGender2 == null ||
+              eventNameController.text.isEmpty ||
+              eventPlaceController.text.isEmpty ||
+              eventTimeController.text.isEmpty ||
+              guestNoController.text.isEmpty ||
+              selectedDate == null) {
+            return;
+          }
           _submitEventPermitForm(
-            fullNameController.text.trim(),
-            int.tryParse(ageController.text.trim()) ?? 0,
-            citizenshipController.text.trim(),
-            selectedCivilStatus2 ?? '',
-            selectedGender2 ?? '',
-            eventNameController.text.trim(),
-            eventPlaceController.text.trim(),
-            eventTimeController.text.trim(),
-            int.tryParse(guestNoController.text.trim()) ?? 0,
-          );
+              fullNameController.text.trim(),
+              int.tryParse(ageController.text.trim()) ?? 0,
+              citizenshipController.text.trim(),
+              selectedCivilStatus2 ?? '',
+              selectedGender2 ?? '',
+              eventNameController.text.trim(),
+              eventPlaceController.text.trim(),
+              eventTimeController.text.trim(),
+              int.tryParse(guestNoController.text.trim()) ?? 0,
+              selectedDate ?? DateTime.now());
 
           // Clear the text fields after submission
+          _addChatMessage(_buildChatBubble([
+            Text(
+                "Thank you. Your request for an event permit has been submitted. You will receive a confirmation once it's ready for pickup.")
+          ]));
+
           setState(() {
             fullNameController.clear();
             ageController.clear();
@@ -929,16 +1023,16 @@ class _ChatBotState extends State<ChatBot> {
   }
 
   void _submitEventPermitForm(
-    String fullName,
-    int age,
-    String citizenship,
-    String civilStatus,
-    String gender,
-    String eventName,
-    String eventPlace,
-    String eventTime,
-    int guestNo,
-  ) async {
+      String fullName,
+      int age,
+      String citizenship,
+      String civilStatus,
+      String gender,
+      String eventName,
+      String eventPlace,
+      String eventTime,
+      int guestNo,
+      DateTime eventDate) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -959,10 +1053,31 @@ class _ChatBotState extends State<ChatBot> {
           'gender': gender,
           'event_name': eventName,
           'event_place': eventPlace,
+          'event_date': eventDate,
           'event_time': eventTime,
           'guest_no': guestNo,
         },
       });
+
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
+
+      if (result.docs.length > 0) {
+        result.docs.forEach((doc) async {
+          final notifRef =
+              FirebaseFirestore.instance.collection('notifications');
+
+          await notifRef.add({
+            'is_read': false,
+            'notif_msg': '$fullName has requested an Event Permit.',
+            'receiver_uid': doc.id,
+            'timestamp': FieldValue.serverTimestamp(),
+            'type': 'request',
+          });
+        });
+      }
 
       // Show confirmation toast message
       Fluttertoast.showToast(
@@ -1071,6 +1186,14 @@ class _ChatBotState extends State<ChatBot> {
                 };
               }).toList();
 
+              if (householdHeadController.text.isEmpty ||
+                  addressController.text.isEmpty ||
+                  numOfMembersController.text.isEmpty ||
+                  contactNumberController.text.isEmpty ||
+                  members.isEmpty) {
+                return;
+              }
+
               _submitHouseholdRegistrationForm(
                 householdHeadController.text.trim(),
                 addressController.text.trim(),
@@ -1078,6 +1201,9 @@ class _ChatBotState extends State<ChatBot> {
                 contactNumberController.text.trim(),
                 members,
               );
+
+              _addChatMessage(_buildChatBubble(
+                  [Text("Thank you for registering your household details.")]));
 
               void _clearMembersControllers() {
                 for (var controllerMap in membersControllers) {
@@ -1148,7 +1274,7 @@ class _ChatBotState extends State<ChatBot> {
             'notif_msg': '${householdHead} has registered their household.',
             'receiver_uid': doc.id,
             'timestamp': FieldValue.serverTimestamp(),
-            'type': 'request',
+            'type': 'household',
           });
         });
       }
@@ -1245,6 +1371,15 @@ class _ChatBotState extends State<ChatBot> {
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
+          if (whatController.text.isEmpty ||
+              whereController.text.isEmpty ||
+              whenController.text.isEmpty ||
+              whyController.text.isEmpty ||
+              howController.text.isEmpty ||
+              howController.text.isEmpty ||
+              complainantController.text.isEmpty) {
+            return;
+          }
           _submitBlotterReportForm(
             whatController.text.trim(),
             whereController.text.trim(),
@@ -1253,6 +1388,12 @@ class _ChatBotState extends State<ChatBot> {
             howController.text.trim(),
             complainantController.text.trim(),
           );
+
+          _addChatMessage(_buildChatBubble([
+            Text(
+                "Your blotter report has been submitted. We will notify you with updates about its status.")
+          ]));
+
           // Clear the form fields
           setState(() {
             whatController.clear();
@@ -1321,7 +1462,7 @@ class _ChatBotState extends State<ChatBot> {
             'notif_msg': '${complainant} has submitted a blotter report.',
             'receiver_uid': doc.id,
             'timestamp': FieldValue.serverTimestamp(),
-            'type': 'request',
+            'type': 'report',
           });
         });
       }

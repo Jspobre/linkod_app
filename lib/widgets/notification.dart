@@ -275,7 +275,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
                                           EventsPage()));
-                                } else if (notification['type' == 'bill']) {
+                                } else if (notification['type'] == 'bill') {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
                                           ElectricBillPage()));
