@@ -19,7 +19,7 @@ void main() async {
 
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings(
-          '@mipmap/ic_launcher'); // The converted icon file
+          '@mipmap/launcher_icon'); // The converted icon file
 
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
