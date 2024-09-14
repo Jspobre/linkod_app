@@ -430,7 +430,7 @@ class _ChatBotState extends State<ChatBot> {
 
       await firestore.collection('requests').add({
         'full_name': fullName,
-        'status': 'Pending',
+        'status': 'pending',
         'type': 'Barangay Clearance',
         'date_requested': FieldValue.serverTimestamp(),
         'uid': uid, // Add UID to the Firestore document
