@@ -82,7 +82,7 @@ class _ReportPageState extends State<ReportPage> {
                     return Center(
                       child: Text(
                         'No reports found.',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                       ),
                     );
                   }
