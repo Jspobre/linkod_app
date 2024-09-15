@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:linkod_app/pages/electricBillPage.dart';
+import 'package:linkod_app/pages/eventPage.dart';
+import 'package:linkod_app/pages/reportPage.dart';
+import 'package:linkod_app/pages/requestPage.dart';
 import '../service/notification_service.dart'; // Import the notification service
+import 'package:badges/badges.dart' as badges;
 
 class NotificationWidget extends StatefulWidget {
   @override
@@ -15,8 +21,8 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   @override
   void initState() {
     super.initState();
-    _fetchUnreadCount();
-    _listenForNewNotifications();
+    // _fetchUnreadCount();
+    // _listenForNewNotifications();
     _checkReminders();
   }
 
@@ -59,7 +65,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         .collection('notifications')
         .doc(notificationId)
         .update({'is_read': true});
-    _fetchUnreadCount();
+    // _fetchUnreadCount();
   }
 
   void _checkReminders() async {
@@ -67,77 +73,83 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     if (userId == null) return;
 
     final now = DateTime.now();
+    final startOfToday = DateTime(now.year, now.month, now.day, 12, 00, 00);
+    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    final startOfTomorrow = startOfToday.add(Duration(days: 1));
+    final endOfTomorrow = endOfToday.add(Duration(days: 1));
+
+    // Fetch reminders from today to the end of tomorrow
     final reminderSnapshot = await FirebaseFirestore.instance
         .collection('reminders')
         .where('user_id', isEqualTo: userId)
-        .where('date', isGreaterThanOrEqualTo: now)
+        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfToday))
+        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfTomorrow))
         .get();
 
     for (var doc in reminderSnapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
       final title = data['title'] ?? 'No title';
       final date = (data['date'] as Timestamp).toDate();
+      final time = data['time'] ?? '';
 
-      if (date.isBefore(now.add(Duration(days: 1)))) {
-        // Send local notification
+      // Check if the event is for tomorrow
+      if (date.isAfter(endOfToday) && date.isBefore(endOfTomorrow)) {
+        // Send local notification for tomorrow's event
         _notificationService.showNotification(
           'Reminder: $title',
-          'You have an upcoming event tomorrow!',
+          'The event is tomorrow at $time!',
         );
+      }
 
-        // Insert into notifications collection
-        // await FirebaseFirestore.instance.collection('notifications').add({
-        //   'receiver_uid': userId,
-        //   'notif_msg': 'Reminder: $title - You have an event tomorrow!',
-        //   'type': 'reminder',
-        //   'timestamp': Timestamp.now(),
-        //   'is_read': false,
-        // });
+      // Check if the event is for today
+      if (date.isAfter(now) && date.isBefore(endOfToday) ||
+          date.isAtSameMomentAs(now)) {
+        // Send local notification for today's event
+        _notificationService.showNotification(
+          'Reminder: $title',
+          'Today at $time!',
+        );
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        IconButton(
-          icon: Icon(
-            Icons.notifications,
-            color: Colors.white,
-            size: 30.0,
-          ),
-          onPressed: () {
-            _showNotificationDialog(context);
-          },
-        ),
-        if (_unreadCount > 0)
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              constraints: BoxConstraints(
-                minWidth: 20,
-                minHeight: 20,
-              ),
-              child: Center(
-                child: Text(
-                  '$_unreadCount',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+    return IconButton(
+      icon: FirebaseAuth.instance.currentUser?.uid != null
+          ? StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('notifications')
+                  .where('receiver_uid',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                  .where('is_read', isEqualTo: false)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                print(FirebaseAuth.instance.currentUser?.uid);
+                int messageCount = snapshot.data?.docs.length ?? 0;
+                print(messageCount);
+
+                return badges.Badge(
+                  showBadge: messageCount > 0,
+                  badgeContent: Text(
+                    messageCount.toString(),
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
                   ),
-                ),
-              ),
+                  child: Icon(
+                    Icons.notifications,
+                    color: Colors.white,
+                    size: 30.0,
+                  ),
+                );
+              })
+          : Icon(
+              Icons.notifications,
+              color: Colors.white,
+              size: 30.0,
             ),
-          ),
-      ],
+      onPressed: () {
+        _showNotificationDialog(context);
+      },
     );
   }
 
@@ -191,7 +203,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                         return Center(
                           child: Text(
                             'No notifications available.',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
                         );
                       }
@@ -225,20 +237,51 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                               ],
                             ),
                             child: ListTile(
-                              leading: Icon(Icons.notifications,
-                                  color: Colors.white),
+                              leading: notification['type'] == 'request'
+                                  ? Icon(Icons.mail, color: Colors.white)
+                                  : notification['type'] == 'report'
+                                      ? Icon(Icons.file_open)
+                                      : notification['type'] == 'event'
+                                          ? Icon(Icons.event)
+                                          : notification['type'] == 'bill'
+                                              ? Icon(Icons.electric_bolt)
+                                              : Icon(Icons.notifications,
+                                                  color: Colors.white),
                               title: Text(
                                 notification['notif_msg'] ?? 'No message',
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              // subtitle: Text(
-                              //   notification['type'] ?? 'No type',
-                              //   style: TextStyle(color: Colors.grey[200]),
-                              // ),
+                              subtitle: Text(
+                                formatDateTime(notification['timestamp']),
+                                style: TextStyle(
+                                    color: Colors.grey[200],
+                                    fontSize: 10,
+                                    fontStyle: FontStyle.italic),
+                              ),
                               onTap: () {
                                 _markAsRead(notificationId);
-                                Navigator.of(context)
-                                    .pop(); // Close dialog after clicking
+                                if (notification['type'] == 'request') {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          RequestPage()));
+                                } else if (notification['type'] == 'report') {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ReportPage()));
+                                } else if (notification['type'] == 'event') {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          EventsPage()));
+                                } else if (notification['type'] == 'bill') {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ElectricBillPage()));
+                                } else {
+                                  Navigator.pop(context);
+                                }
                               },
                             ),
                           );
@@ -269,6 +312,31 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     );
   }
 
+  String formatDateTime(Timestamp dateTime) {
+    DateTime notifDateTime = dateTime.toDate();
+    DateTime now = DateTime.now();
+
+    DateTime dateToday = DateTime(now.year, now.month, now.day);
+    DateTime notifDate =
+        DateTime(notifDateTime.year, notifDateTime.month, notifDateTime.day);
+
+    bool isSameDate = dateToday.isAtSameMomentAs(notifDate);
+
+    String formattedDateTime = (isSameDate)
+        ? DateFormat('hh:mm a').format(notifDateTime)
+        : (notifDateTime.isAfter(
+            now.subtract(const Duration(days: 6)),
+          ))
+            ? DateFormat('EEE \'at\' hh:mm a').format(notifDateTime)
+            : (notifDateTime.isAfter(
+                DateTime(now.year - 1, now.month, now.day),
+              ))
+                ? DateFormat('MMM d \'at\' hh:mm a').format(notifDateTime)
+                : DateFormat('MM/dd/yy \'at\' hh:mm a').format(notifDateTime);
+
+    return formattedDateTime;
+  }
+
   Stream<QuerySnapshot> _getNotificationsStream() {
     final userId =
         FirebaseAuth.instance.currentUser?.uid; // Get the current user's ID
@@ -278,6 +346,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     return FirebaseFirestore.instance
         .collection('notifications')
         .where('receiver_uid', isEqualTo: userId)
+        .where('is_read', isEqualTo: false)
         .snapshots();
   }
 }

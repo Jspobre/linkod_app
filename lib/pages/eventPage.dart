@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:linkod_app/pages/eventView.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/drawer.dart';
@@ -32,6 +33,7 @@ class _EventsPageState extends State<EventsPage> {
 
       final events = snapshot.docs.map((doc) {
         return {
+          'docId': doc.id,
           'title': doc['title'] ?? '',
           'date': (doc['event_date'] as Timestamp?)?.toDate() ?? DateTime.now(),
           'time': doc['event_time'] ?? '',
@@ -122,9 +124,48 @@ class _EventsPageState extends State<EventsPage> {
                   eventLoader: (day) {
                     return _events[day] ?? [];
                   },
+                  calendarBuilders: CalendarBuilders(
+                    markerBuilder: (context, day, events) {
+                      if (events.isNotEmpty) {
+                        // Limit the number of markers to 4 and add a "+x" marker for additional events
+                        int markerCount = events.length;
+                        List<Widget> markers = events.take(3).map((event) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.blueAccent),
+                            width: 8.0,
+                            height: 8.0,
+                          );
+                        }).toList();
+
+                        if (markerCount > 3) {
+                          markers.add(
+                            Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 1.5),
+                              child: Text(
+                                "+${markerCount - 3}",
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 10.0,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: markers,
+                        );
+                      }
+                    },
+                  ),
                   calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
-                      color: Colors.deepOrange,
+                      color: Colors.orange[500],
                       shape: BoxShape.circle,
                     ),
                     markerDecoration: BoxDecoration(
@@ -158,16 +199,17 @@ class _EventsPageState extends State<EventsPage> {
                     _events[_selectedDay]!.isNotEmpty)
                   ..._events[_selectedDay]!.map((event) {
                     return announcementCard(
-                      title: event['title'],
-                      date: event['date'],
-                      time: event['time'],
-                      location: event['location'],
-                      description: event['description'],
-                      imageUrl: event['image'],
-                      onRemindMeClicked: () {
-                        _addReminder(event['title'], event['date']);
-                      },
-                    );
+                        title: event['title'],
+                        date: event['date'],
+                        time: event['time'],
+                        location: event['location'],
+                        description: event['description'],
+                        imageUrl: event['image'],
+                        onRemindMeClicked: () {
+                          _addReminder(event['title'], event['date'],
+                              event['time'], event['docId']);
+                        },
+                        docId: event['docId'] ?? '');
                   }).toList()
                 else
                   Center(
@@ -189,135 +231,167 @@ class _EventsPageState extends State<EventsPage> {
     required String description,
     required String imageUrl,
     required VoidCallback onRemindMeClicked,
+    required String docId,
   }) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    title,
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => EventView(
+                  date: date,
+                  description: description,
+                  imageUrl: imageUrl,
+                  location: location,
+                  onRemindMeClicked: onRemindMeClicked,
+                  time: time,
+                  title: title,
+                  docId: docId,
+                  category: 'Events',
+                )));
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        elevation: 5,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF312E81),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('reminders')
+                          .where('user_id',
+                              isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                          .where('event_doc_id', isEqualTo: docId)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData &&
+                            snapshot.data!.docs.length > 0) {
+                          return SizedBox.shrink();
+                        }
+                        return ElevatedButton(
+                          onPressed: () {
+                            onRemindMeClicked();
+                            Fluttertoast.showToast(
+                              msg: "Reminder set for $title",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              backgroundColor: Colors.green,
+                              textColor: Colors.white,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Remind Me',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }),
+                ],
+              ),
+              SizedBox(height: 12),
+              if (imageUrl.isNotEmpty)
+                Image.network(
+                  imageUrl,
+                  height: 150,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.calendar_today,
+                      color: Colors.deepPurple, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    _formatDate(date),
                     style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF312E81),
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    onRemindMeClicked();
-                    Fluttertoast.showToast(
-                      msg: "Reminder set for $title",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      backgroundColor: Colors.green,
-                      textColor: Colors.white,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      fontSize: 14,
+                      color: Colors.black,
                     ),
                   ),
-                  child: Text(
-                    'Remind Me',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            if (imageUrl.isNotEmpty)
-              Image.network(
-                imageUrl,
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
+                ],
               ),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, color: Colors.deepPurple, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  _formatDate(date),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.access_time, color: Colors.deepPurple, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    time,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.access_time, color: Colors.deepPurple, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  time,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.location_on, color: Colors.deepPurple, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  location,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black,
+                ],
               ),
-              overflow: TextOverflow.ellipsis, // Prevent overflow
-              maxLines: 3, // Limit to 3 lines
-            ),
-            SizedBox(height: 12),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text(
-                '#fun #seeyou',
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.location_on, color: Colors.deepPurple, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    location,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Text(
+                description,
                 style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
+                overflow: TextOverflow.ellipsis, // Prevent overflow
+                maxLines: 3, // Limit to 3 lines
+              ),
+              SizedBox(height: 12),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Text(
+                  '#fun #seeyou',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _addReminder(String title, DateTime date) async {
+  void _addReminder(
+      String title, DateTime date, String time, String docId) async {
     try {
       final userId =
           FirebaseAuth.instance.currentUser?.uid; // Get the current user's ID
@@ -326,6 +400,8 @@ class _EventsPageState extends State<EventsPage> {
         'date': date,
         'user_id': userId,
         'is_read': false,
+        'time': time,
+        'event_doc_id': docId,
       });
       Fluttertoast.showToast(
         msg: "Reminder added for $title",

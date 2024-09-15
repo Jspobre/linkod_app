@@ -33,6 +33,8 @@ class _SignupPageState extends State<SignupPage> {
   String? _selectedCivilStatus;
   String? _selectedGender;
 
+  bool isLoading = false;
+
   void _nextPage() {
     if (_currentPage < 3) {
       _pageController.nextPage(
@@ -112,6 +114,9 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> signUp() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
       // Create the user with email and password
       UserCredential userCredential =
@@ -146,7 +151,7 @@ class _SignupPageState extends State<SignupPage> {
         'email': _emailController.text.trim(),
         'gender': _selectedGender,
         'joined_full_name':
-            '${_firstNameController.text.trim()} ${_middleNameController.text.trim()} ${_lastNameController.text.trim()}',
+            '${_firstNameController.text.trim()} ${_middleNameController.text.trim().characters.first}. ${_lastNameController.text.trim()}',
         'profile_pic': profilePicUrl ?? '',
         'role': 'user',
         'status': 'pending',
@@ -155,31 +160,54 @@ class _SignupPageState extends State<SignupPage> {
         'zone': _zoneController.text.trim(),
       });
 
-      // Show success toast
-      Fluttertoast.showToast(
-        msg: "Signup successful!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      final result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('role', isEqualTo: 'admin')
+          .get();
 
-      // Clear the form
-      _firstNameController.clear();
-      _middleNameController.clear();
-      _lastNameController.clear();
-      _birthdayController.clear();
-      _ageController.clear();
-      _contactNumberController.clear();
-      _emailController.clear();
-      _passwordController.clear();
-      _zoneController.clear();
-      _pickedProfileFile = null;
-      _pickedFile = null;
-      _selectedCivilStatus = null;
-      _selectedGender = null;
+      if (result.docs.length > 0) {
+        result.docs.forEach((doc) async {
+          final notifRef =
+              FirebaseFirestore.instance.collection('notifications');
+
+          await notifRef.add({
+            'is_read': false,
+            'notif_msg':
+                '${_firstNameController.text.trim()} ${_middleNameController.text.trim().characters.first}. ${_lastNameController.text.trim()} has registered and is waiting for account approval.',
+            'receiver_uid': doc.id,
+            'timestamp': FieldValue.serverTimestamp(),
+            'type': 'user',
+          });
+        });
+
+        // Show success toast
+        Fluttertoast.showToast(
+          msg: "Signup successful!",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+
+        setState(() {
+          // Clear the form
+          _firstNameController.clear();
+          _middleNameController.clear();
+          _lastNameController.clear();
+          _birthdayController.clear();
+          _ageController.clear();
+          _contactNumberController.clear();
+          _emailController.clear();
+          _passwordController.clear();
+          _zoneController.clear();
+          _pickedProfileFile = null;
+          _pickedFile = null;
+          _selectedCivilStatus = null;
+          _selectedGender = null;
+        });
+      }
     } catch (e) {
       // Handle error
       print(e.toString());
@@ -192,6 +220,10 @@ class _SignupPageState extends State<SignupPage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -344,6 +376,10 @@ class _SignupPageState extends State<SignupPage> {
                     icon: Icons.person,
                   ),
                   _buildDropdown(
+                    prefixIcon: Icon(
+                      Icons.people,
+                      color: Colors.grey,
+                    ),
                     value: _selectedCivilStatus,
                     hint: 'Civil status',
                     items: ['Single', 'Married', 'Divorced', 'Widowed'],
@@ -354,6 +390,10 @@ class _SignupPageState extends State<SignupPage> {
                     },
                   ),
                   _buildDropdown(
+                    prefixIcon: Icon(
+                      Icons.person_pin,
+                      color: Colors.grey,
+                    ),
                     value: _selectedGender,
                     hint: 'Gender',
                     items: ['Male', 'Female'],
@@ -431,7 +471,7 @@ class _SignupPageState extends State<SignupPage> {
                   // const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 80.0, right: 80.0, bottom: 20.0),
+                        left: 40.0, right: 40.0, bottom: 20.0),
                     child: ElevatedButton(
                       onPressed: _pickFile,
                       style: ElevatedButton.styleFrom(
@@ -445,7 +485,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Icon(
                             Icons.attach_file,
@@ -471,7 +511,7 @@ class _SignupPageState extends State<SignupPage> {
                   // const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.only(
-                        left: 80.0, right: 80.0, bottom: 20.0),
+                        left: 40.0, right: 40.0, bottom: 20.0),
                     child: ElevatedButton(
                       onPressed: _pickProfileFile,
                       style: ElevatedButton.styleFrom(
@@ -485,7 +525,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Icon(
                             Icons.attach_file,
@@ -526,7 +566,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           // Call your sign-up function here
-                          // _signUp();
+                          signUp();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.deepPurpleAccent,
@@ -535,8 +575,10 @@ class _SignupPageState extends State<SignupPage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                         ),
-                        child: const Text('Sign Up',
-                            style: TextStyle(color: Colors.white)),
+                        child: isLoading
+                            ? CircularProgressIndicator()
+                            : Text('Sign Up',
+                                style: TextStyle(color: Colors.white)),
                       ),
                     ),
                   ),
@@ -660,6 +702,7 @@ class _SignupPageState extends State<SignupPage> {
     return Padding(
       padding: const EdgeInsets.only(left: 40.0, right: 40.0, bottom: 20.0),
       child: TextField(
+        textCapitalization: TextCapitalization.words,
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
@@ -693,19 +736,19 @@ class _SignupPageState extends State<SignupPage> {
     );
   }
 
-  Widget _buildDropdown({
-    required String? value,
-    required String hint,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
+  Widget _buildDropdown(
+      {required String? value,
+      required String hint,
+      required List<String> items,
+      required ValueChanged<String?> onChanged,
+      required Widget prefixIcon}) {
     return Padding(
       padding: const EdgeInsets.only(left: 40.0, right: 40.0, bottom: 20.0),
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
-          prefixIcon: Icon(Icons.arrow_drop_down, color: Colors.grey),
+          prefixIcon: prefixIcon,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide.none,

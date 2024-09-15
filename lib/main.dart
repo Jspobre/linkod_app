@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:linkod_app/firebase_options.dart';
+import 'package:linkod_app/pages/homePage.dart';
 import './pages/loginPage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -10,10 +14,12 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  await Firebase.initializeApp(
+      name: "linkod_app", options: DefaultFirebaseOptions.currentPlatform);
 
   const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('linkod'); // The converted icon file
+      AndroidInitializationSettings(
+          '@mipmap/launcher_icon'); // The converted icon file
 
   final InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -38,8 +44,8 @@ class MyApp extends StatelessWidget {
           secondary: Color(
               0xFF312E81), // Optional: set secondary color to match background
         ),
-        useMaterial3: true,
         textTheme: GoogleFonts.poppinsTextTheme(),
+        useMaterial3: true,
         scaffoldBackgroundColor: Color.fromARGB(255, 28, 25, 106),
       ),
       home: const MyHomePage(),
