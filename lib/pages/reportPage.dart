@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore package
 import 'package:intl/intl.dart'; // Import intl package for date formatting
@@ -11,8 +12,6 @@ class ReportPage extends StatefulWidget {
 
 class _ReportPageState extends State<ReportPage> {
   // Firestore reference
-  final CollectionReference blotterReportsCollection =
-      FirebaseFirestore.instance.collection('blotter_reports');
 
   // Map to keep track of expanded states
   Map<String, bool> expandedStates = {};
@@ -57,7 +56,11 @@ class _ReportPageState extends State<ReportPage> {
             // Fetch and display Firestore data
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: blotterReportsCollection.snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('blotter_reports')
+                    .where('uid',
+                        isEqualTo: FirebaseAuth.instance.currentUser?.uid ?? '')
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(
@@ -82,7 +85,7 @@ class _ReportPageState extends State<ReportPage> {
                     return Center(
                       child: Text(
                         'No reports found.',
-                        style: TextStyle(color: Colors.black),
+                        style: TextStyle(color: Colors.white),
                       ),
                     );
                   }
