@@ -20,9 +20,6 @@ class _HomePageState extends State<HomePage> {
     'News',
     'Events',
     'Updates',
-    'Alerts',
-    'Notifications',
-    'Reminders'
   ];
 
   @override

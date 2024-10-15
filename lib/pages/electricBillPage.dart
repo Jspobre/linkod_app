@@ -37,7 +37,29 @@ class ElectricBillPage extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
-            return Center(child: Text('No bill data available'));
+            return Column(
+              children: [
+                Center(
+                  child: Text(
+                    'Electric Bill Notice',
+                    style: GoogleFonts.lato(
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Center(
+                    child: Text(
+                  'No bill data available',
+                  style: TextStyle(color: Colors.white),
+                )),
+              ],
+            );
           }
 
           var billData = snapshot.data!.data() as Map<String, dynamic>;

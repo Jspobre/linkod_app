@@ -118,9 +118,10 @@ class AppDrawer extends StatelessWidget {
             title: Text('Logout'),
             onTap: () async {
               await FirebaseAuth.instance.signOut();
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => LoginPage()),
+                (route) => false,
               );
             },
           ),

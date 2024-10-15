@@ -91,12 +91,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 28, 25, 106),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        automaticallyImplyLeading: false,
       ),
       backgroundColor: const Color.fromARGB(255, 28, 25, 106),
       body: Stack(
