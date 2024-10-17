@@ -57,7 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
     User? user = FirebaseAuth.instance.currentUser;
     if (_image != null && user != null) {
       // Upload image to Firebase Storage
-      String fileName = 'profile_pics/${user.uid}.jpg';
+      String fileName = 'profile_pic/${user.uid}.jpg';
       Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
       UploadTask uploadTask = storageRef.putFile(_image!);
 
