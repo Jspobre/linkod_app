@@ -153,6 +153,8 @@ class ElectricBillPage extends StatelessWidget {
                     const SizedBox(height: 20),
                     _buildInfoRow('BAPA Member Name', billData['bapa_name']),
                     const SizedBox(height: 10),
+                    _buildStatusRow(billData['status']),
+                    const SizedBox(height: 10),
                     _buildInfoRow('Meter No.', billData['meter_no'].toString()),
                     const SizedBox(height: 10),
                     _buildInfoRow(
@@ -219,5 +221,59 @@ class ElectricBillPage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildStatusRow(String status) {
+    IconData statusIcon;
+    Color iconColor;
+
+    // Determine the icon and color based on status
+    if (status == 'pending') {
+      statusIcon = Icons.pending;
+      iconColor = Colors.orange;
+    } else if (status == 'paid') {
+      statusIcon = Icons.check_circle;
+      iconColor = Colors.green;
+    } else {
+      statusIcon = Icons.error;
+      iconColor = Colors.red;
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Status',
+          style: GoogleFonts.lato(
+            textStyle: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Row(
+          children: [
+            Icon(statusIcon, color: iconColor, size: 20),
+            const SizedBox(width: 5),
+            Text(
+              status.capitalize(), // Capitalize first letter of status
+              style: GoogleFonts.lato(
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white70,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+extension StringCasingExtension on String {
+  String capitalize() {
+    return this[0].toUpperCase() + substring(1);
   }
 }

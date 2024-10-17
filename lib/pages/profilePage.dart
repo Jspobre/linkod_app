@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 import '../widgets/drawer.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -18,6 +21,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController contactNumberController = TextEditingController();
 
   String? profilePicUrl;
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -48,6 +53,43 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _uploadProfilePicture() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (_image != null && user != null) {
+      // Upload image to Firebase Storage
+      String fileName = 'profile_pics/${user.uid}.jpg';
+      Reference storageRef = FirebaseStorage.instance.ref().child(fileName);
+      UploadTask uploadTask = storageRef.putFile(_image!);
+
+      await uploadTask.whenComplete(() => null);
+
+      // Get the download URL
+      String downloadUrl = await storageRef.getDownloadURL();
+
+      // Update Firestore with the new profile pic URL
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'profile_pic': downloadUrl});
+
+      setState(() {
+        profilePicUrl = downloadUrl;
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+      _uploadProfilePicture();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,14 +117,16 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: 20),
-              CircleAvatar(
-                radius: 70,
-                backgroundImage:
-                    profilePicUrl != null && profilePicUrl!.isNotEmpty
-                        ? NetworkImage(profilePicUrl!)
-                        : AssetImage('images/lingkod_logo.png')
-                            as ImageProvider, // Default to lingkod_logo.png
-                backgroundColor: Colors.white.withOpacity(0.1),
+              GestureDetector(
+                onTap: _pickImage, // Trigger image picker on tap
+                child: CircleAvatar(
+                  radius: 70,
+                  backgroundImage: profilePicUrl != null &&
+                          profilePicUrl!.isNotEmpty
+                      ? NetworkImage(profilePicUrl!)
+                      : AssetImage('images/lingkod_logo.png') as ImageProvider,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                ),
               ),
               SizedBox(height: 20),
               Text(

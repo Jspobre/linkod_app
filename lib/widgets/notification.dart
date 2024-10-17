@@ -50,12 +50,25 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         .where('receiver_uid', isEqualTo: userId)
         .where('is_read', isEqualTo: false)
         .snapshots()
-        .listen((snapshot) {
+        .listen((snapshot) async {
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
-        final message = data['notif_msg'] ?? 'No message';
-        final type = data['type'] ?? 'No type';
-        _notificationService.showNotification(type, message);
+        final eventId = data['event_id'];
+
+        // Check if the corresponding event still exists
+        final eventDoc = await FirebaseFirestore.instance
+            .collection('events')
+            .doc(eventId)
+            .get();
+
+        if (eventDoc.exists) {
+          final message = data['notif_msg'] ?? 'No message';
+          final type = data['type'] ?? 'No type';
+          _notificationService.showNotification(type, message);
+        } else {
+          // If event is deleted, remove the notification
+          await doc.reference.delete();
+        }
       }
     });
   }
@@ -88,27 +101,38 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
     for (var doc in reminderSnapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
-      final title = data['title'] ?? 'No title';
-      final date = (data['date'] as Timestamp).toDate();
-      final time = data['time'] ?? '';
+      final eventId = data['event_id'];
 
-      // Check if the event is for tomorrow
-      if (date.isAfter(endOfToday) && date.isBefore(endOfTomorrow)) {
-        // Send local notification for tomorrow's event
-        _notificationService.showNotification(
-          'Reminder: $title',
-          'The event is tomorrow at $time!',
-        );
-      }
+      // Check if the corresponding event still exists
+      final eventDoc = await FirebaseFirestore.instance
+          .collection('events')
+          .doc(eventId)
+          .get();
 
-      // Check if the event is for today
-      if (date.isAfter(now) && date.isBefore(endOfToday) ||
-          date.isAtSameMomentAs(now)) {
-        // Send local notification for today's event
-        _notificationService.showNotification(
-          'Reminder: $title',
-          'Today at $time!',
-        );
+      if (eventDoc.exists) {
+        final title = eventDoc['title'] ?? 'No title';
+        final date = (eventDoc['date'] as Timestamp).toDate();
+        final time = eventDoc['time'] ?? '';
+
+        // Check if the event is for tomorrow
+        if (date.isAfter(endOfToday) && date.isBefore(endOfTomorrow)) {
+          _notificationService.showNotification(
+            'Reminder: $title',
+            'The event is tomorrow at $time!',
+          );
+        }
+
+        // Check if the event is for today
+        if (date.isAfter(now) && date.isBefore(endOfToday) ||
+            date.isAtSameMomentAs(now)) {
+          _notificationService.showNotification(
+            'Reminder: $title',
+            'Today at $time!',
+          );
+        }
+      } else {
+        // If event is deleted, remove the reminder
+        await doc.reference.delete();
       }
     }
   }
