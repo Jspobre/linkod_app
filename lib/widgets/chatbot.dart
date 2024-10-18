@@ -1254,7 +1254,9 @@ class _ChatBotState extends State<ChatBot> {
         'address': address,
         'number_of_members': numOfMembers,
         'contact_number': contactNumber,
-        'members': members,
+        'members': members.map((m) {
+          return {'name': m['name'], 'age': int.parse(m['age'] ?? '0')};
+        }),
         'user_uid': user?.uid, // Include UID
         'timestamp': FieldValue.serverTimestamp(),
       });

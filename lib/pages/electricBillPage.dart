@@ -164,7 +164,7 @@ class ElectricBillPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     _buildInfoRow(
                       'Total Amount',
-                      '₱ ${billData['total_due']}',
+                      '${billData['total_due']} PHP',
                     ),
                     const SizedBox(height: 10),
                     _buildInfoRow(
@@ -228,7 +228,7 @@ class ElectricBillPage extends StatelessWidget {
     Color iconColor;
 
     // Determine the icon and color based on status
-    if (status == 'pending') {
+    if (status == 'unpaid') {
       statusIcon = Icons.pending;
       iconColor = Colors.orange;
     } else if (status == 'paid') {
@@ -243,7 +243,7 @@ class ElectricBillPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Status',
+          'Payment Status',
           style: GoogleFonts.lato(
             textStyle: const TextStyle(
               fontSize: 16,
