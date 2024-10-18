@@ -24,6 +24,47 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     // _fetchUnreadCount();
     // _listenForNewNotifications();
     _checkReminders();
+    _checkDisconnectionReminders();
+  }
+
+  void _checkDisconnectionReminders() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final now = DateTime.now();
+    final threeDaysFromNow = now.add(Duration(days: 3));
+    final threeDaysFromNowEnd = threeDaysFromNow.add(Duration(days: 1));
+
+    // Fetch unpaid bills where disconnection_date is exactly 3 days from now
+    final billSnapshot = await FirebaseFirestore.instance
+        .collection('bills')
+        .where('uid', isEqualTo: userId)
+        .where('disconnection_date',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(threeDaysFromNow))
+        .where('disconnection_date',
+            isLessThan: Timestamp.fromDate(threeDaysFromNowEnd))
+        .where('status', isEqualTo: 'unpaid')
+        .where('is_sent',
+            isEqualTo:
+                false) // Only fetch bills that haven't sent notifications
+        .get();
+
+    for (var doc in billSnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final bapaName = data['bapa_name'] ?? 'No name';
+      final disconnectionDate =
+          (data['disconnection_date'] as Timestamp).toDate();
+      final totalDue = data['total_due'] ?? 0;
+
+      // Send a notification 3 days before the disconnection date
+      _notificationService.showNotification(
+        'Disconnection Warning',
+        'Dear $bapaName, your bill of \$${totalDue.toString()} is due for disconnection on ${DateFormat('MMMM d, yyyy').format(disconnectionDate)}. Please pay to avoid disconnection.',
+      );
+
+      // Update the document to mark the notification as sent
+      await doc.reference.update({'is_sent': true});
+    }
   }
 
   void _fetchUnreadCount() async {
@@ -86,12 +127,12 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     if (userId == null) return;
 
     final now = DateTime.now();
-    final startOfToday = DateTime(now.year, now.month, now.day, 12, 00, 00);
+    final startOfToday = DateTime(now.year, now.month, now.day, 0, 0, 0);
     final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
     final startOfTomorrow = startOfToday.add(Duration(days: 1));
     final endOfTomorrow = endOfToday.add(Duration(days: 1));
 
-    // Fetch reminders from today to the end of tomorrow
+    // Fetch reminders for today and tomorrow
     final reminderSnapshot = await FirebaseFirestore.instance
         .collection('reminders')
         .where('user_id', isEqualTo: userId)
@@ -101,38 +142,57 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
     for (var doc in reminderSnapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
-      final eventId = data['event_id'];
+      final eventDocId = data['event_doc_id'];
+      final sentForTomorrow = data['sent_for_tomorrow'] ?? false;
+      final sentForToday = data['sent_for_today'] ?? false;
 
-      // Check if the corresponding event still exists
-      final eventDoc = await FirebaseFirestore.instance
-          .collection('events')
-          .doc(eventId)
-          .get();
+      try {
+        final eventDoc = await FirebaseFirestore.instance
+            .collection('events')
+            .doc(eventDocId)
+            .get();
 
-      if (eventDoc.exists) {
-        final title = eventDoc['title'] ?? 'No title';
-        final date = (eventDoc['date'] as Timestamp).toDate();
-        final time = eventDoc['time'] ?? '';
+        if (eventDoc.exists) {
+          final title = eventDoc['title'] ?? 'No title';
+          final date = (eventDoc['date'] as Timestamp).toDate();
+          final time = eventDoc['time'] ?? '';
 
-        // Check if the event is for tomorrow
-        if (date.isAfter(endOfToday) && date.isBefore(endOfTomorrow)) {
-          _notificationService.showNotification(
-            'Reminder: $title',
-            'The event is tomorrow at $time!',
-          );
+          // Check for tomorrow's event
+          if (date.isAfter(endOfToday) &&
+              date.isBefore(endOfTomorrow) &&
+              !sentForTomorrow) {
+            _notificationService.showNotification(
+              'Reminder: $title',
+              'The event is tomorrow at $time!',
+            );
+            // Update the reminder to mark it as sent for tomorrow
+            await doc.reference.update({'sent_for_tomorrow': true});
+          }
+
+          // Check for today's event
+          if (date.isAfter(now) && date.isBefore(endOfToday) && !sentForToday) {
+            // Send notification for today before the event starts
+            _notificationService.showNotification(
+              'Reminder: $title',
+              'Reminder: The event is today at $time!',
+            );
+            // Update the reminder to mark it as sent for today
+            await doc.reference.update({'sent_for_today': true});
+          }
+
+          // Notify the user if the event is happening right now
+          if (date.isAtSameMomentAs(now)) {
+            _notificationService.showNotification(
+              'Reminder: $title',
+              'The event is happening now!',
+            );
+          }
+        } else {
+          print('Event $eventDocId does not exist, deleting reminder');
+          await doc.reference.delete();
         }
-
-        // Check if the event is for today
-        if (date.isAfter(now) && date.isBefore(endOfToday) ||
-            date.isAtSameMomentAs(now)) {
-          _notificationService.showNotification(
-            'Reminder: $title',
-            'Today at $time!',
-          );
-        }
-      } else {
-        // If event is deleted, remove the reminder
-        await doc.reference.delete();
+      } catch (e) {
+        print('Error fetching event $eventDocId: $e');
       }
     }
   }

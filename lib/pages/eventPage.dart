@@ -400,6 +400,8 @@ class _EventsPageState extends State<EventsPage> {
         'date': date,
         'user_id': userId,
         'is_read': false,
+        'sent_for_tomorrow': false,
+        'sent_for_today': false,
         'time': time,
         'event_doc_id': docId,
       });

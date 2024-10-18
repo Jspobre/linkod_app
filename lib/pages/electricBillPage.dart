@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart'; // Import for date formatting
 import '../widgets/drawer.dart';
+import '../widgets/notification.dart';
 
 class ElectricBillPage extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -26,6 +27,19 @@ class ElectricBillPage extends StatelessWidget {
             },
           ),
         ),
+        actions: [
+          // IconButton(
+          //   icon: Icon(
+          //     Icons.notifications,
+          //     color: Colors.white,
+          //     size: 30.0,
+          //   ),
+          //   onPressed: () {
+          //     _showNotificationWindow(context);
+          //   },
+          // ),
+          NotificationWidget()
+        ],
       ),
       drawer: AppDrawer(),
       backgroundColor: const Color.fromARGB(255, 28, 25, 106),
