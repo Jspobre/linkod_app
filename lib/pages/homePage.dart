@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:linkod_app/pages/eventView.dart';
+import 'package:linkod_app/service/notification_service.dart';
 import '../widgets/drawer.dart';
 import '../widgets/chatbot.dart';
 import 'package:intl/intl.dart';
@@ -15,12 +16,101 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final NotificationService _notificationService = NotificationService();
   int _selectedIndex = 0;
   final List<String> _categories = [
     'News',
     'Events',
     'Updates',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkDisconnectionReminders();
+    checkDueDateReminders();
+  }
+
+  void _checkDisconnectionReminders() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final now = DateTime.now();
+    final threeDaysFromNow = now.add(Duration(days: 3));
+    final threeDaysFromNowEnd = threeDaysFromNow.add(Duration(days: 1));
+    print("executed this");
+
+    // Fetch unpaid bills where disconnection_date is exactly 3 days from now
+    final billSnapshot = await FirebaseFirestore.instance
+        .collection('bills')
+        .where('uid', isEqualTo: userId)
+        .orderBy('disconnection_date')
+        .startAfter([threeDaysFromNow])
+        .endAt([threeDaysFromNowEnd])
+        .where('status', isEqualTo: 'unpaid')
+        .where('is_sent',
+            isEqualTo:
+                false) // Only fetch bills that haven't sent notifications
+        .get();
+
+    for (var doc in billSnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final bapaName = data['bapa_name'] ?? 'No name';
+      print(bapaName);
+      final disconnectionDate =
+          (data['disconnection_date'] as Timestamp).toDate();
+      final totalDue = data['total_due'] ?? 0;
+
+      // Send a notification 3 days before the disconnection date
+      _notificationService.showNotification(
+        'Disconnection Warning',
+        'Dear $bapaName, your bill of \$${totalDue.toString()} is due for disconnection on ${DateFormat('MMMM d, yyyy').format(disconnectionDate)}. Please pay to avoid disconnection.',
+      );
+
+      // Update the document to mark the notification as sent
+      await doc.reference.update({'is_sent': true});
+    }
+  }
+
+  void checkDueDateReminders() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day - 1, 23, 59, 59);
+    final endOfDay =
+        DateTime(now.year, now.month, now.day, 23, 59, 59); // End of today
+    print("executed this");
+
+    // Fetch unpaid bills where disconnection_date is exactly 3 days from now
+    final billSnapshot = await FirebaseFirestore.instance
+        .collection('bills')
+        .where('uid', isEqualTo: userId)
+        .orderBy('due_date')
+        .startAfter([startOfDay])
+        .endAt([endOfDay])
+        .where('status', isEqualTo: 'unpaid')
+        .where('due_notif_sent',
+            isEqualTo:
+                false) // Only fetch bills that haven't sent notifications
+        .get();
+
+    for (var doc in billSnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final bapaName = data['bapa_name'] ?? 'No name';
+      print(bapaName);
+      final totalDue = data['total_due'] ?? 0;
+
+      // Send a notification 3 days before the disconnection date
+      _notificationService.showNotification(
+        'Due Warning',
+        'Dear $bapaName, your bill of \$${totalDue.toString()} is due for today. Please pay to avoid disconnection.',
+      );
+
+      // Update the document to mark the notification as sent
+      await doc.reference.update({'due_notif_sent': true});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
