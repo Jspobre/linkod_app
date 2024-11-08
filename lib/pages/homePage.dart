@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       // Send a notification 3 days before the disconnection date
       _notificationService.showNotification(
         'Disconnection Warning',
-        'Dear $bapaName, your bill of \$${totalDue.toString()} is due for disconnection on ${DateFormat('MMMM d, yyyy').format(disconnectionDate)}. Please pay to avoid disconnection.',
+        'Dear $bapaName, your bill of \₱${totalDue.toString()} is due for disconnection on ${DateFormat('MMMM d, yyyy').format(disconnectionDate)}. Please pay to avoid disconnection.',
       );
 
       // Update the document to mark the notification as sent
@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
       // Send a notification 3 days before the disconnection date
       _notificationService.showNotification(
         'Due Warning',
-        'Dear $bapaName, your bill of \$${totalDue.toString()} is due for today. Please pay to avoid disconnection.',
+        'Dear $bapaName, your bill of \₱${totalDue.toString()} is due for today. Please pay to avoid disconnection.',
       );
 
       // Update the document to mark the notification as sent
