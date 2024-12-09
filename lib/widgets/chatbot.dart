@@ -174,7 +174,7 @@ class _ChatBotState extends State<ChatBot> {
               Container(
                 padding: const EdgeInsets.all(10.0),
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple,
+                  color: const Color.fromARGB(255, 42, 8, 163),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -707,6 +707,29 @@ class _ChatBotState extends State<ChatBot> {
       readOnly: readOnly,
       onTap: onTap,
       onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBlotterTextArea(
+    String label,
+    TextEditingController controller, {
+    void Function()? onTap,
+    bool readOnly = false,
+    void Function(String)? onChanged,
+  }) {
+    return TextFormField(
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
+      onChanged: onChanged,
+      maxLines: null, // Allows the TextField to grow as needed
+      keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(
@@ -1327,82 +1350,39 @@ class _ChatBotState extends State<ChatBot> {
 
 // BLOTTER FORM
   Widget _buildBlotterReportForm() {
-    TextEditingController whatController = TextEditingController();
-    TextEditingController whereController = TextEditingController();
-    TextEditingController whenController = TextEditingController();
-    TextEditingController whyController = TextEditingController();
-    TextEditingController howController = TextEditingController();
+    TextEditingController reportController = TextEditingController();
     TextEditingController complainantController = TextEditingController();
-
     return _buildChatBubble([
       Text(
         'Please provide the following information for the Blotter Report:',
         style: TextStyle(
-            color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold),
+          color: Colors.black,
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       SizedBox(height: 10),
-      _buildTextField('What', whatController),
-      const SizedBox(height: 10),
-      _buildTextField('Where', whereController),
-      const SizedBox(height: 10),
-      _buildTextField(
-        'When',
-        whenController,
-        onTap: () async {
-          DateTime? pickedDate = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2101),
-          );
-          if (pickedDate != null) {
-            setState(() {
-              whenController.text =
-                  DateFormat('MMMM dd, yyyy').format(pickedDate);
-            });
-          }
-        },
-        readOnly: true,
+      _buildBlotterTextArea(
+        'Please describe the incident in detail',
+        reportController,
       ),
-      const SizedBox(height: 10),
-      _buildTextField('Why', whyController),
-      const SizedBox(height: 10),
-      _buildTextField('How', howController),
       const SizedBox(height: 10),
       _buildTextField('Complainant', complainantController),
       SizedBox(height: 10),
       ElevatedButton(
         onPressed: () {
-          if (whatController.text.isEmpty ||
-              whereController.text.isEmpty ||
-              whenController.text.isEmpty ||
-              whyController.text.isEmpty ||
-              howController.text.isEmpty ||
-              howController.text.isEmpty ||
+          if (reportController.text.isEmpty ||
               complainantController.text.isEmpty) {
             return;
           }
           _submitBlotterReportForm(
-            whatController.text.trim(),
-            whereController.text.trim(),
-            whenController.text.trim(),
-            whyController.text.trim(),
-            howController.text.trim(),
+            reportController.text.trim(),
             complainantController.text.trim(),
           );
 
-          _addChatMessage(_buildChatBubble([
-            Text(
-                "Your blotter report has been submitted. We will notify you with updates about its status.")
-          ]));
-
           // Clear the form fields
           setState(() {
-            whatController.clear();
-            whereController.clear();
-            whenController.clear();
-            whyController.clear();
-            howController.clear();
+            reportController.clear();
             complainantController.clear();
           });
         },
@@ -1421,11 +1401,7 @@ class _ChatBotState extends State<ChatBot> {
   }
 
   void _submitBlotterReportForm(
-    String what,
-    String where,
-    String when,
-    String why,
-    String how,
+    String complaint,
     String complainant,
   ) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -1439,11 +1415,7 @@ class _ChatBotState extends State<ChatBot> {
       await firestore.collection('blotter_reports').add({
         'reported_date': reportedDate,
         'reported_time': reportedTime,
-        'what': what,
-        'where': where,
-        'when': when,
-        'why': why,
-        'how': how,
+        'complaint': complaint,
         'complainant': complainant,
         'uid': uid,
         'timestamp': FieldValue.serverTimestamp(),
@@ -1475,7 +1447,7 @@ class _ChatBotState extends State<ChatBot> {
           style: TextStyle(
             color: Colors.black,
             fontSize: 15,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.normal,
           ),
         ),
       ]));

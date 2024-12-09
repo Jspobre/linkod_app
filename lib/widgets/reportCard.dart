@@ -11,14 +11,13 @@ class ReportCard extends StatefulWidget {
 
 class _ReportCardState extends State<ReportCard> {
   bool isExpanded = false;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         setState(() {
           isExpanded = !isExpanded;
-          // report['isExpanded'] = !report['isExpanded'];
-          // expandedStates[reportId] = report['isExpanded']; // Store the state
         });
       },
       child: Card(
@@ -44,52 +43,66 @@ class _ReportCardState extends State<ReportCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.report['complainant'],
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                widget.report['complainant'],
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Spacer(),
+                              Icon(
+                                widget.report['status'] == 'resolved'
+                                    ? Icons.check_circle
+                                    : Icons.pending,
+                                color: widget.report['status'] == 'resolved'
+                                    ? Colors.green
+                                    : Colors.orange,
+                                size: 24,
+                              ),
+                              SizedBox(
+                                height: 8,
+                                width: 4,
+                              ),
+                              Text(
+                                widget.report['status'],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: widget.report['status'] == 'resolved'
+                                      ? Colors.green
+                                      : Colors.orange,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          widget.report['what'],
-                          style: TextStyle(fontSize: 14, color: Colors.white70),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Reported: ${widget.report['reported_date']}',
-                          style: TextStyle(fontSize: 14, color: Colors.white70),
-                        ),
-                      ],
+                          SizedBox(height: 8),
+                          Text(
+                            'Complaint: ${widget.report['complaint']}',
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.white70),
+                            maxLines: 2, // Limit the preview to 2 lines
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Reported: ${widget.report['reported_date']}',
+                            style:
+                                TextStyle(fontSize: 14, color: Colors.white70),
+                          ),
+                        ],
+                      ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Icon(
-                          widget.report['status'] == 'resolved'
-                              ? Icons.check_circle
-                              : Icons.pending,
-                          color: widget.report['status'] == 'resolved'
-                              ? Colors.green
-                              : Colors.orange,
-                          size: 24,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          widget.report['status'],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: widget.report['status'] == 'resolved'
-                                ? Colors.green
-                                : Colors.orange,
-                          ),
-                        ),
-                      ],
+                      children: [],
                     ),
                   ],
                 ),
@@ -103,23 +116,9 @@ class _ReportCardState extends State<ReportCard> {
                         thickness: 1,
                         height: 20,
                       ),
-                      Text(
-                        'Where: ${widget.report['where']}',
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
-                      ),
                       SizedBox(height: 8),
                       Text(
-                        'When: ${widget.report['when']}',
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Why: ${widget.report['why']}',
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'How: ${widget.report['how']}',
+                        'Complaint: ${widget.report['complaint']}',
                         style: TextStyle(fontSize: 14, color: Colors.white70),
                       ),
                       SizedBox(height: 8),

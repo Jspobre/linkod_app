@@ -99,12 +99,12 @@ class _ReportPageState extends State<ReportPage> {
 
                       var report = {
                         'complainant': reportData['complainant'] ?? 'Unknown',
-                        'what': reportData['what'] ?? 'Unknown',
-                        'where': reportData['where'] ?? 'Unknown',
-                        'when': reportData['when'] ?? 'Unknown',
-                        'why': reportData['why'] ?? 'Unknown',
-                        'how': reportData['how'] ?? 'Unknown',
-                        'status': reportData['status'] ?? 'Unknown',
+                        // 'what': reportData['what'] ?? 'Unknown',
+                        // 'where': reportData['where'] ?? 'Unknown',
+                        // 'when': reportData['when'] ?? 'Unknown',
+                        // 'why': reportData['why'] ?? 'Unknown',
+                        'complaint': reportData['complaint'] ?? 'Unknown',
+                        'status': reportData['status'] ?? 'ongoing',
                         'reported_date':
                             reportData['reported_date'] ?? 'Unknown',
                         'reported_time':

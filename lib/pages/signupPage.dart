@@ -126,14 +126,9 @@ class _SignupPageState extends State<SignupPage> {
       );
 
       String? profilePicUrl;
-      String? validIdUrl;
 
       if (_pickedProfileFile != null) {
         profilePicUrl = await _uploadFile(_pickedProfileFile!, 'profile_pic');
-      }
-
-      if (_pickedFile != null) {
-        validIdUrl = await _uploadFile(_pickedFile!, 'valid_id');
       }
 
       // Add user details to Firestore
@@ -156,7 +151,6 @@ class _SignupPageState extends State<SignupPage> {
         'role': 'user',
         'status': 'pending',
         'uid': userCredential.user?.uid ?? '',
-        'valid_id': validIdUrl ?? '',
         'zone': _zoneController.text.trim(),
       });
 
@@ -203,7 +197,6 @@ class _SignupPageState extends State<SignupPage> {
           _passwordController.clear();
           _zoneController.clear();
           _pickedProfileFile = null;
-          _pickedFile = null;
           _selectedCivilStatus = null;
           _selectedGender = null;
         });
@@ -469,44 +462,44 @@ class _SignupPageState extends State<SignupPage> {
                     obscureText: true,
                   ),
                   // const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 40.0, right: 40.0, bottom: 20.0),
-                    child: ElevatedButton(
-                      onPressed: _pickFile,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color.fromARGB(255, 255, 255, 255),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15.0, horizontal: 20.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.attach_file,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(width: 10),
-                          Flexible(
-                            child: Text(
-                              _fileName == null
-                                  ? 'Upload Valid ID'
-                                  : 'File: $_fileName',
-                              style: const TextStyle(
-                                  color: Color.fromARGB(255, 99, 92, 92)),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(
+                  //       left: 40.0, right: 40.0, bottom: 20.0),
+                  //   child: ElevatedButton(
+                  //     onPressed: _pickFile,
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor:
+                  //           const Color.fromARGB(255, 255, 255, 255),
+                  //       padding: const EdgeInsets.symmetric(
+                  //           vertical: 15.0, horizontal: 20.0),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(10.0),
+                  //       ),
+                  //     ),
+                  //     child: Row(
+                  //       mainAxisSize: MainAxisSize.max,
+                  //       mainAxisAlignment: MainAxisAlignment.start,
+                  //       children: [
+                  //         Icon(
+                  //           Icons.attach_file,
+                  //           color: Colors.grey,
+                  //         ),
+                  //         const SizedBox(width: 10),
+                  //         Flexible(
+                  //           child: Text(
+                  //             _fileName == null
+                  //                 ? 'Upload Valid ID'
+                  //                 : 'File: $_fileName',
+                  //             style: const TextStyle(
+                  //                 color: Color.fromARGB(255, 99, 92, 92)),
+                  //             overflow: TextOverflow.ellipsis,
+                  //             maxLines: 1,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
 
                   // const SizedBox(height: 20),
                   Padding(

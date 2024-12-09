@@ -16,6 +16,31 @@
       "api_key": [
         {
           "current_key": "AIzaSyDNsLG3-PU8PWVZdpZ-23-0aKDaGs3dCG4"
+        },
+        {
+          "current_key": "AIzaSyCcIZACjunUedfztkU8dDUlLZYZdbvpc8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299121262016:android:778a573987e1bada5e1c25",
+        "android_client_info": {
+          "package_name": "com.linkod.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNsLG3-PU8PWVZdpZ-23-0aKDaGs3dCG4"
+        },
+        {
+          "current_key": "AIzaSyCcIZACjunUedfztkU8dDUlLZYZdbvpc8Q"
         }
       ],
       "services": {
@@ -35,6 +60,9 @@
       "api_key": [
         {
           "current_key": "AIzaSyDNsLG3-PU8PWVZdpZ-23-0aKDaGs3dCG4"
+        },
+        {
+          "current_key": "AIzaSyCcIZACjunUedfztkU8dDUlLZYZdbvpc8Q"
         }
       ],
       "services": {

@@ -132,28 +132,56 @@ class RequestPage extends StatelessWidget {
                                                 color: Colors.white70),
                                           ),
                                           SizedBox(width: 8),
-                                          Icon(
-                                            document['status'] ==
-                                                    'pending' // Updated to lowercase 'pending'
-                                                ? Icons.pending
-                                                : Icons.check_circle,
-                                            color: document['status'] ==
-                                                    'pending' // Updated to lowercase 'pending'
-                                                ? Colors.orange
-                                                : Colors.green,
-                                            size: 20,
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            document['status'] ?? 'Unknown',
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: document['status'] ==
-                                                        'pending' // Updated to lowercase 'pending'
-                                                    ? Colors.orange
-                                                    : Colors.green),
-                                          ),
+                                          if (document['status'] ==
+                                              'pending') ...[
+                                            Icon(
+                                              Icons.pending,
+                                              color: Colors.orange,
+                                              size: 20,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              document['status'] ?? 'Unknown',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.orange),
+                                            ),
+                                          ] else if (document['status'] ==
+                                              'dissaprove') ...[
+                                            Icon(
+                                              Icons.cancel_rounded,
+                                              color: Colors.redAccent,
+                                              size: 20,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              document['status'] ?? 'Unknown',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.redAccent),
+                                            ),
+                                          ] else ...[
+                                            Icon(
+                                              Icons.check_circle,
+                                              color: Colors.green,
+                                              size: 20,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              document['status'] ?? 'Unknown',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.green),
+                                            ),
+                                          ],
                                         ],
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Remarks: ${document['remarks'] ?? 'unkown'}',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white70),
                                       ),
                                       SizedBox(height: 8),
                                       Text(
