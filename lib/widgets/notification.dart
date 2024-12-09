@@ -24,7 +24,8 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     // _fetchUnreadCount();
     // _listenForNewNotifications();
     _checkReminders();
-    _checkDisconnectionReminders();
+    _checkTodayReminders();
+    // _checkDisconnectionReminders();
   }
 
   void _checkDisconnectionReminders() async {
@@ -34,6 +35,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     final now = DateTime.now();
     final threeDaysFromNow = now.add(Duration(days: 3));
     final threeDaysFromNowEnd = threeDaysFromNow.add(Duration(days: 1));
+    print("executed this");
 
     // Fetch unpaid bills where disconnection_date is exactly 3 days from now
     final billSnapshot = await FirebaseFirestore.instance
@@ -52,6 +54,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     for (var doc in billSnapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
       final bapaName = data['bapa_name'] ?? 'No name';
+      print(bapaName);
       final disconnectionDate =
           (data['disconnection_date'] as Timestamp).toDate();
       final totalDue = data['total_due'] ?? 0;
@@ -127,24 +130,23 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     if (userId == null) return;
 
     final now = DateTime.now();
-    final startOfToday = DateTime(now.year, now.month, now.day, 0, 0, 0);
-    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
-    final startOfTomorrow = startOfToday.add(Duration(days: 1));
-    final endOfTomorrow = endOfToday.add(Duration(days: 1));
+    final startOfTomorrow = DateTime(now.year, now.month, now.day, 23, 59, 59);
+    final endOfTomorrow =
+        DateTime(now.year, now.month, now.day + 1, 23, 59, 59);
 
     // Fetch reminders for today and tomorrow
     final reminderSnapshot = await FirebaseFirestore.instance
         .collection('reminders')
         .where('user_id', isEqualTo: userId)
-        .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfToday))
-        .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endOfTomorrow))
+        .orderBy('date')
+        .startAfter([startOfTomorrow])
+        .endAt([endOfTomorrow])
+        .where("sent_for_tomorrow", isEqualTo: false)
         .get();
 
     for (var doc in reminderSnapshot.docs) {
       final data = doc.data() as Map<String, dynamic>;
       final eventDocId = data['event_doc_id'];
-      final sentForTomorrow = data['sent_for_tomorrow'] ?? false;
-      final sentForToday = data['sent_for_today'] ?? false;
 
       try {
         final eventDoc = await FirebaseFirestore.instance
@@ -154,39 +156,60 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
         if (eventDoc.exists) {
           final title = eventDoc['title'] ?? 'No title';
-          final date = (eventDoc['date'] as Timestamp).toDate();
-          final time = eventDoc['time'] ?? '';
+          final time = eventDoc['event_time'] ?? '';
 
-          // Check for tomorrow's event
-          if (date.isAfter(endOfToday) &&
-              date.isBefore(endOfTomorrow) &&
-              !sentForTomorrow) {
-            _notificationService.showNotification(
-              'Reminder: $title',
-              'The event is tomorrow at $time!',
-            );
-            // Update the reminder to mark it as sent for tomorrow
-            await doc.reference.update({'sent_for_tomorrow': true});
-          }
+          _notificationService.showNotification(
+            'Reminder: $title',
+            'The event is tomorrow at $time!',
+          );
+          await doc.reference.update({'sent_for_tomorrow': true});
+        } else {
+          print('Event $eventDocId does not exist, deleting reminder');
+          await doc.reference.delete();
+        }
+      } catch (e) {
+        print('Error fetching event $eventDocId: $e');
+      }
+    }
+  }
 
-          // Check for today's event
-          if (date.isAfter(now) && date.isBefore(endOfToday) && !sentForToday) {
-            // Send notification for today before the event starts
-            _notificationService.showNotification(
-              'Reminder: $title',
-              'Reminder: The event is today at $time!',
-            );
-            // Update the reminder to mark it as sent for today
-            await doc.reference.update({'sent_for_today': true});
-          }
+  void _checkTodayReminders() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
 
-          // Notify the user if the event is happening right now
-          if (date.isAtSameMomentAs(now)) {
-            _notificationService.showNotification(
-              'Reminder: $title',
-              'The event is happening now!',
-            );
-          }
+    final now = DateTime.now();
+    final startOfToday = DateTime(now.year, now.month, now.day - 1, 23, 59, 59);
+    final endOfToday = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    // Fetch reminders for today and tomorrow
+    final reminderSnapshot = await FirebaseFirestore.instance
+        .collection('reminders')
+        .where('user_id', isEqualTo: userId)
+        .orderBy('date')
+        .startAfter([startOfToday])
+        .endAt([endOfToday])
+        .where("sent_for_today", isEqualTo: false)
+        .get();
+
+    for (var doc in reminderSnapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      final eventDocId = data['event_doc_id'];
+
+      try {
+        final eventDoc = await FirebaseFirestore.instance
+            .collection('events')
+            .doc(eventDocId)
+            .get();
+
+        if (eventDoc.exists) {
+          final title = eventDoc['title'] ?? 'No title';
+          final time = eventDoc['event_time'] ?? '';
+
+          _notificationService.showNotification(
+            'Reminder: $title',
+            'Reminder: The event is today at $time!',
+          );
+          await doc.reference.update({'sent_for_today': true});
         } else {
           print('Event $eventDocId does not exist, deleting reminder');
           await doc.reference.delete();
